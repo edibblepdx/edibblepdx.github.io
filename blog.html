@@ -1,0 +1,70 @@
+<!-- Blog Boilerplate -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>dibble</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark-dimmed.css">
+        <link rel="stylesheet" href="styles/reset.css">
+        <link rel="stylesheet" href="styles/palette.css">
+        <link rel="stylesheet" href="styles/blog.css">
+    </head>
+    <body>
+    <main class="toc-true">
+    <div class="title">
+        <h1>A Blog Entry</h1>
+        <h3>A subtitle</h3>
+    </div>
+    <div>
+        <section id="introduction"></section>
+        <h3>dsafkljdsa;flkjads;lkfjasdlkfj</h3>
+        <p>Stupid little test thing :)</p>
+        <pre><code class="language-javascript">
+    class Rotation {
+    static #orientation = quat.create();
+    static #speed = 60;
+
+    static UP = (out, dt) => {
+        let rotation = quat.create();
+        quat.rotateY(rotation, rotation, dt * glMatrix.toRadian(this.#speed));
+        this.#applyRotation(out, rotation);
+    };
+    }
+        </code></pre>
+        <p>This looks cool</p>
+        <section id="opabinia"></section>
+        <p>hi</p>
+        <div class="pad-scroll"></div>
+        <section id="anomalocaris"></section>
+        <p>hi</p>
+        <div class="pad-scroll"></div>
+        <section id="cats"></section>
+        <p>hi</p>
+        <div class="pad-scroll"></div>
+        <section id="fish"></section>
+        <p>hi</p>
+        <div class="pad-scroll"></div>
+        <section id="human"></section>
+        <p>hi</p>
+        <div class="pad-scroll"></div>
+    </div>
+    <!-- Testing -->
+    <div class="pad-scroll"></div>
+    <nav class="toc">
+        <p>TABLE OF CONTENTS</p>
+        <ol>
+            <li><a href="#introduction">introduction</a></li>
+            <li><a href="#opabinia">opabinia</a></li>
+            <li><a href="#anomalocaris">anomalocaris</a></li>
+            <li><a href="#cats">cats</a></li>
+            <li><a href="#fish">fish</a></li>
+            <li><a href="#human">human</a></li>
+        </ol>
+    </nav>
+    </main>
+    </body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    <script src="scripts/toc.js"></script>
+</html>
+
