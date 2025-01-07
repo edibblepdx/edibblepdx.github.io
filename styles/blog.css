@@ -1,10 +1,5 @@
-html, body {
-    height: 100%;
-    margin: 0;
-    background-color: var(--soft-black);
-    font-size: 18px;
-    scroll-behavior: smooth;
-    color: var(--soft-white);
+main {
+    margin-top: 3rem;
 }
 main.toc-true {
     display: grid;
@@ -37,7 +32,7 @@ main.toc-false nav {
 main > div {
     grid-row: 2;
     grid-column: 2;
-    align-self: start;
+    align-self: stretch;
 }
 main > nav {
     grid-row: 2;
@@ -45,7 +40,7 @@ main > nav {
     align-self: start;
     position: sticky;
     padding-left: 2rem;
-    top: 3rem;
+    top: 5rem;
 }
 .toc p {
     margin-left: 1rem;
@@ -59,6 +54,7 @@ main > nav {
 }
 .toc li {
     margin-left: 1rem;
+    margin-top: 1rem;
 }
 .toc li.active > a {
     color: var(--color2);
@@ -83,7 +79,7 @@ main > nav {
 pre {
     text-wrap: nowrap;
     border: 1px solid #1a1a1a;
-    filter: drop-shadow(10px 10px 3px #1f1f1f);
+    filter: drop-shadow(10px 10px 3px var(--shadow));
     font-size: 12px;
     margin-top: 20px;
     margin-bottom: 20px;
