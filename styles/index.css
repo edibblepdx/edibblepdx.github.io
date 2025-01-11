@@ -1,0 +1,20 @@
+main {
+    display: grid;
+    grid-template-columns: 
+        minmax(2rem, 1fr) 
+        minmax(0, 40rem) 
+        minmax(2rem, 1fr);
+}
+/* squish edge padding on narrower screens */
+@media only screen and (max-width: 40rem) {
+    main {
+        grid-template-columns:
+            minmax(1rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(1rem, 1fr);
+    }
+} 
+main > article {
+    grid-column: 2;
+    align-self: stretch;
+}
