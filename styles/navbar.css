@@ -1,31 +1,47 @@
- /* Style the navbar */
 #navbar {
     position: fixed;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
     width: 100vw;
     z-index: 100;
-    top: 0;
     overflow: hidden;
     background-color: var(--soft-gray);
     filter: drop-shadow(0px 10px 3px var(--shadow));
+    top: 0;
 }
-
-/* Navbar links */
-#navbar a {
-    float: left;
+#navbar ul {
+    grid-column: 2;
+    justify-self: center;
+    align-self: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#navbar li {
+    display: inline-block;
+}
+#navbar li > a {
     display: block;
     color: var(--soft-white);
     text-align: center;
-    padding: 14px;
     text-decoration: none;
+    font-weight: bold;
+    padding: 1rem;
 }
-
-/* Page content */
 .content {
     margin-top: 3rem;
 } 
-
-@media only screen {
-    #navbar a {
-        float: center;
-    }
+.search {
+    display: block;
+    grid-column: 1;
+    justify-self: center;
+    align-self: center;
+    margin-left: 2rem;
+}
+.github-mark {
+    display: block;
+    grid-column: 3;
+    justify-self: center;
+    align-self: center;
+    margin-right: 2rem;
 }

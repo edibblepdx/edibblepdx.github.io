@@ -47,3 +47,8 @@ html, body {
     scroll-behavior: smooth;
     color: var(--soft-white);
 }
+
+/* TESTING */
+/* * {
+    border: 1px solid red;
+} */

@@ -1,34 +1,48 @@
 main {
+    display: grid;
+    grid-template-rows: 15rem 1fr;
+    grid-template-columns: 
+        minmax(2rem, 1fr) 
+        minmax(0, 40rem) 
+        minmax(2rem, 1fr);
     margin-top: 3rem;
 }
 main.toc-true {
-    display: grid;
-    grid-template-rows: 15rem 1fr;
-    grid-template-columns: 15rem 1fr 20rem;
+    grid-template-columns: 
+        minmax(2rem, 1fr) 
+        minmax(0, 40rem) 
+        minmax(15rem, 1fr);
 }
 main.toc-false {
-    display: grid;
-    grid-template-rows: 15rem 1fr;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 
+        minmax(2rem, 1fr) 
+        minmax(0, 40rem) 
+        minmax(2rem, 1fr);
 }
-@media only screen and (max-width: 70rem) {
+main.toc-false > nav {
+    display: none;
+}
+/* hide toc on narrow screens */
+@media only screen and (max-width: 65rem) {
     main.toc-true,
     main.toc-false {
-        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-columns: 
+            minmax(2rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(2rem, 1fr);
     }
-    nav {
-        display: none;
-    }
+    nav {display: none;}
 }
+/* squish edge padding on narrower screens */
 @media only screen and (max-width: 40rem) {
     main.toc-true,
     main.toc-false {
-        grid-template-columns: 1.5rem 2fr 1fr;
+        grid-template-columns:
+            minmax(1rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(1rem, 1fr);
     }
-}
-main.toc-false nav {
-    display: none;
-}
+} 
 main > div {
     grid-row: 2;
     grid-column: 2;
@@ -38,8 +52,8 @@ main > nav {
     grid-row: 2;
     grid-column: 3;
     align-self: start;
-    position: sticky;
     padding-left: 2rem;
+    position: sticky;
     top: 5rem;
 }
 .toc p {
