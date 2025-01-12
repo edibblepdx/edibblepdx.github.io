@@ -13,7 +13,7 @@ if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
     # stage and push files
     git add --all \
     && git commit -m "$(date)" \
-    && git push -u origin gh-pages
+    && git push -u origin gh-pages --force
 
     # go back to main branch
     git checkout main
