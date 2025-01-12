@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # move changes into deployment branch
-git branch -D gh-pages
+git branch -D gh-pages > /dev/null 2>&1
 git switch --orphan gh-pages && git checkout main dist
 
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
