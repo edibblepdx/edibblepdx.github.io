@@ -64622,7 +64622,23 @@
         })
     );
 
-    document.getElementById('content').innerHTML =
-        marked.parse('# Marked in browser\n\nRendered by **marked**.');
+    let params = new URLSearchParams(document.location.search);
+    let title = params.get("title");
+    if (title) {
+        fetch('posts/test.md')
+            .then((response) => {
+                return response.text();
+            })
+            .then((text) => {
+                document.getElementById('content').innerHTML = marked.parse(text);
+            })
+            .catch(() => {
+                document.getElementById('content').innerHTML = marked.parse('# File Not Found');
+                console.error("ERROR::FILE::NOT_FOUND");
+            });
+    } else {
+        document.getElementById('content').innerHTML = marked.parse('# File NULL');
+        console.error("ERROR::FILE::NULL");
+    }
 
 })();
