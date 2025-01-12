@@ -18,11 +18,11 @@ main > article {
     grid-column: 2;
     align-self: stretch;
 }
+/* might interfere with navbar */
 a {
     display: block;
     color: var(--soft-white);
     text-align: center;
     text-decoration: none;
     font-weight: bold;
-    padding: 1rem;
 }
