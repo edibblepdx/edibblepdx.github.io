@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # move changes into deployment branch
-git checkout gh-pages && git merge main
+git checkout gh-pages && git merge main --no-commit
 
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
     # move all files into .gitignore
