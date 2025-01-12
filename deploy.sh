@@ -6,6 +6,7 @@ git switch --orphan gh-pages && git checkout main dist
 
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
     echo "node_modules" >> .gitignore
+    touch .nojekyll
 
     # move distribution files into root
     mv dist/* .
