@@ -68860,8 +68860,8 @@
                 let content = fm(text);
                 document.getElementById('title').innerHTML = 
                     marked.parse(
-                        '# ' + content.attributes.title +
-                        '\n\n' + '### ' + content.attributes.date
+                        '# ' + content.attributes.title + '\n\n' + 
+                        '### ' + content.attributes.date
                     );
                 document.getElementById('content').innerHTML = 
                     marked.parse(content.body);
