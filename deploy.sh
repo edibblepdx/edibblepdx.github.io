@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
 # move changes into deployment branch
-git checkout gh-pages && git rebase main
+git branch -D gh-pages
+git switch --orphan gh-pages && git checkout main dist
 
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
-    # move all files into .gitignore
-    : > .gitignore
-    for filename in *; do
-        echo "$filename" >> .gitignore
-    done
+    echo "node_modules" >> .gitignore
 
     # move distribution files into root
     mv dist/* .
