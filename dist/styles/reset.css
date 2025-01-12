@@ -43,9 +43,10 @@ html, body {
     height: 100%;
     margin: 0;
     background-color: var(--soft-black);
-    font-size: 18px;
+    font-size: 20px;
     scroll-behavior: smooth;
     color: var(--soft-white);
+    font-family: 'Roboto', sans-serif;
 }
 
 /* TESTING */
