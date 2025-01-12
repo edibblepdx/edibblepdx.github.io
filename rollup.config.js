@@ -3,7 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 
 export default [
     {
-        input: 'scripts/post.js',
+        input: 'src/post.js',
         output: {
             file: 'dist/scripts/post.js',
             format: 'iife'
@@ -14,7 +14,7 @@ export default [
         ]
     },
     {
-        input: 'scripts/toc.js',
+        input: 'src/toc.js',
         output: {
             file: 'dist/scripts/toc.js',
             format: 'iife'
