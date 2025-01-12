@@ -14,7 +14,14 @@ main {
             minmax(1rem, 1fr);
     }
 } 
-main > article {
+main > div {
     grid-column: 2;
     align-self: stretch;
+}
+main a {
+    color: var(--soft-white)
+}
+.download {
+    display: inline-block;
+    vertical-align: middle;
 }
