@@ -4249,8 +4249,7 @@
 	    }
 	}
 
-	async function append(title) {
-	    const t = title;
+	async function append(t) {
 	    try {
 	        const response = await fetch('posts/' + t + '.md');
 	        const text = await response.text();

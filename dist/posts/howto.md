@@ -16,6 +16,7 @@ This is the basic structure of the website. There are still more things to consi
 ```
 📁 dist/
 ├── 📁 posts/
+│   ├── 📰 posts.json
 │   └── 📰 post.md
 ├── 📁 resources/
 │   ├── 📰 image.svg
@@ -234,8 +235,7 @@ async function appendPosts() {
     }
 }
 
-async function append(title) {
-    const t = title;
+async function append(t) {
     try {
         const response = await fetch('posts/' + t + '.md')
         const text = await response.text();
