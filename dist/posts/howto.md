@@ -3,6 +3,12 @@ title: How to create a free static website using GitHub Pages.
 date: Jan 12, 2025
 summary: Learn how to create a static website without any frameworks using HTML, CSS, and a few npm packages. We bundle our scripts using Rollup and deploy the site for free using GitHub Pages.
 ---
+
+# Purpose
+# CSS Grid
+
+&nbsp;
+
 # Structure
 
 This is the basic structure of the website. There are still more things to consider on the development branch with node modules and bundling, but this is how the website will be served to its users. 
@@ -86,6 +92,83 @@ export default [
 ```
 
 `iife` stands for "immediately-invoked Function Expression"; a self-executing function, suitable for inclusion as a `<script>` tag, which is our use case.
+
+&nbsp;
+
+# Basic HTML Layout
+
+All `.html` pages will mimic this basic layout. Using CSS Grid, `<main>` will be split into (usually) three columns and may also be split into rowns. Each `<div>` elevement we can place in the center column. This layout is mobile phone friendly and easy to read.
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title><!-- title --></title>
+<!-- Link Stylesheets -->
+        <link rel="stylesheet" href="styles/palette.css">
+        <link rel="stylesheet" href="styles/reset.css">
+        <link rel="stylesheet" href="styles/navbar.css">
+        <link rel="stylesheet" href="styles/unique.css">
+    </head>
+    <body>
+<!-- Navbar -->
+        <div id="navbar"></div> 
+<!-- Main Content -->
+        <main>
+            <div>
+                ...
+            </div>
+        </main>
+    </body>
+<!-- Scripts -->
+    <script src=""></script>
+</html>
+```
+
+# index.html
+# post.html
+# resume.html
+
+# Stylesheets
+I won't won't spend much time on stylesheets, but I will explain the purpose of each one in the order that I include them in each page. If you want a reference, [MDN Web Docs](https://developer.mozilla.org/en-US/) is a good resource.
+
+&nbsp;
+
+`palette.css` includes global variables that define my hex color codes.
+
+```css
+:root {
+    --soft-white: #d0d0d0;
+    --soft-black: #222222;
+    --soft-gray: #2a2a2a;
+    --shadow: #1f1f1f;
+}  
+```
+
+&nbsp;
+
+`reset.css` uses [Josh W Comeau's "A Modern CSS Reset"](https://www.joshwcomeau.com/css/custom-css-reset/). Since this stylesheet will be included everywhere, I appended this to the bottom:
+
+```css
+html, body {
+    height: 100%;
+    margin: 0;
+    background-color: var(--soft-black);
+    font-size: 20px;
+    scroll-behavior: smooth;
+    color: var(--soft-white);
+    font-family: 'Roboto', sans-serif;
+}
+```
+
+&nbsp;
+
+`navbar.css` styles the navbar on each html page.
+
+&nbsp;
+
+`unique.css` is unique to each html page and shares the same name.
 
 &nbsp;
 
@@ -195,49 +278,7 @@ function append(title) {
 
 &nbsp;
 
-# Stylesheets
-I won't won't spend much time on stylesheets, but I will explain the purpose of each one in the order that I include them in each page. If you want a reference, [MDN Web Docs](https://developer.mozilla.org/en-US/) is a good resource.
-
-&nbsp;
-
-`palette.css` includes global variables that define my hex color codes.
-
-```css
-:root {
-    --soft-white: #d0d0d0;
-    --soft-black: #222222;
-    --soft-gray: #2a2a2a;
-    --shadow: #1f1f1f;
-}  
-```
-
-&nbsp;
-
-`reset.css` uses [Josh W Comeau's "A Modern CSS Reset"](https://www.joshwcomeau.com/css/custom-css-reset/). Since this stylesheet will be included everywhere, I appended this to the bottom:
-
-```css
-html, body {
-    height: 100%;
-    margin: 0;
-    background-color: var(--soft-black);
-    font-size: 20px;
-    scroll-behavior: smooth;
-    color: var(--soft-white);
-    font-family: 'Roboto', sans-serif;
-}
-```
-
-&nbsp;
-
-`navbar.css` styles the navbar on each html page.
-
-&nbsp;
-
-`unique.css` is unique to each html page and shares the same name.
-
-&nbsp;
-
-# Scalable Graphics
+# Scalable Vector Graphics
 
 For adding solid-color scalable graphics I recommend using svgs. They don't lose quality when scaled and can be resized or colored directly in the file or with CSS without filters.
 
