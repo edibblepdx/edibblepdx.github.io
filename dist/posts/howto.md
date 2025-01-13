@@ -5,7 +5,8 @@ summary: Learn how to create a static website without any frameworks using HTML,
 ---
 # Structure
 
-This is the basic structure of the website. There are still more things to consider on the development branch with node modules and bundling, but this is how the website will be served to it's users. 
+This is the basic structure of the website. There are still more things to consider on the development branch with node modules and bundling, but this is how the website will be served to its users. 
+
 ```
 📁 dist/
 ├── 📁 posts/
@@ -24,6 +25,7 @@ This is the basic structure of the website. There are still more things to consi
 ├── 📰 post.html
 └── 📰 resume.html
 ```
+
 It only has 3 pages: `index.html`, `post.html`, and `resume.html`. Each of those pages will include the `palette.css`, `reset.css`, `navbar.css`, and `unique.css` stylesheets. The `posts.html` page is simply boilerplate; it will take a title as a search parameter and serve the corresponding markdown file.
 
 &nbsp;
@@ -31,12 +33,165 @@ It only has 3 pages: `index.html`, `post.html`, and `resume.html`. Each of those
 # Let's Begin
 
 Create a new GitHub repository called `username.github.io` and clone that repository into an empty folder, then initialize a new npm project.
+
 ```
 git clone git@github.com:username/username.github.io.git website
+
 cd website
+
 npm init
 ```
+
 We require **rollup** for bundling our scripts, **markedjs** for parsing markdown files, **highlight.js** for code syntax highlighting, **marked-highlight** to use highlight.js with markedjs, and **front-matter** to store YAML-style metadata in our markdown files. If you don't want to use npm packages you can instead use a CDN to include the scripts in HTML, or forgo all of these if you want to write all your posts as separate pages in HTML and don't care about syntax highlighting for code. If you get lost, [check out the source code for this website](https://github.com/edibblepdx/edibblepdx.github.io).
+
+```bash
+npm install marked marked-highlight highlight.js front-matter
+
+npm install rollup @rollup/plugin-commonjs @rollup/plugin-node-resolve --save-dev
+```
+
+Add this build command to your `package.json` under `scripts`:
+
+```javascript
+"scripts": {
+    "build": "rollup --config"
+}
+```
+
+Append this rule to your `package.json` to suppress errors with rollup:
+
+```javascript
+"type": "module"
+```
+
+Create a `rollup.config.js` that looks like this. When you run `rollup --config`, it looks for a predefined config file and executes that. Rollup takes each `input` and bundles it with its imports to create the `output`. You can export an array of bundles.
+
+```javascript
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+
+export default [
+    {
+        input: 'src/file.js',
+        output: {
+            file: 'dist/scripts/file.js',
+            format: 'iife'
+        },
+        plugins: [
+            nodeResolve(),
+            commonjs()
+        ]
+    },
+];
+```
+
+`iife` stands for "immediately-invoked Function Expression"; a self-executing function, suitable for inclusion as a `<script>` tag, which is our use case.
+
+&nbsp;
+
+# Scripts
+
+```javascript
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import hljs from 'highlight.js';
+import fm from 'front-matter';
+
+const marked = new Marked(
+    markedHighlight({
+        emptyLangClass: 'hljs',
+        langPrefix: 'hljs language-',
+        highlight(code, lang, info) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        }
+    })
+);
+
+let params = new URLSearchParams(document.location.search);
+let title = params.get("title");
+if (title) {
+    fetch('posts/' + title  + '.md')
+        .then((response) => {
+            return response.text();
+        })
+        .then((text) => {
+            let content = fm(text);
+            document.getElementById('title').innerHTML = 
+                marked.parse(
+                    '# ' + content.attributes.title + '\n\n' + 
+                    '### ' + content.attributes.date
+                );
+            document.getElementById('content').innerHTML = 
+                marked.parse(content.body);
+        })
+        .catch((err) => {
+            document.getElementById('content').innerHTML = 
+                marked.parse('# File Not Found');
+            console.error(err);
+        })
+} else {
+    document.getElementById('content').innerHTML = 
+        marked.parse('# File NULL');
+    console.error("ERROR::FILE::NULL");
+}
+```
+
+```javascript
+import fm from 'front-matter';
+
+const posts = [/* Post Filenames */];
+
+posts.forEach(append);
+
+function append(title) {
+    const t = title;
+    fetch('posts/' + title  + '.md')
+        .then((response) => {
+            return response.text();
+        })
+        .then((text) => {
+            const content = fm(text);
+            const template = document.getElementById('listItem');
+            const clone = template.content.cloneNode(true);
+
+            const anchor = clone.querySelector('a');
+            anchor.href = 'post.html?title=' + t;
+
+            const title = clone.querySelector('#post-title');
+            title.textContent = content.attributes.title;
+
+            const date = clone.querySelector('#post-date')
+            date.textContent = content.attributes.date;
+
+            const summary = clone.querySelector('#post-summary');
+            summary.textContent = content.attributes.summary;
+
+            document.getElementById('list').appendChild(clone);
+        })
+        .catch((err) => {
+            console.error(err);
+        })
+}
+```
+
+```html
+<div id="list">
+    <ul></ul>
+    <template id="listItem">
+        <li><a href="post.html?title=">
+            <h2 id="post-title"></h2><br/>
+            <p id="post-summary"></p><br/>
+            <p id="post-date"></p>
+        </a></li>
+    </template>
+</div>
+```
+
+```html
+    <script type="module" src="scripts/file.js"></script>
+</html>
+```
 
 &nbsp;
 
@@ -59,6 +214,7 @@ I won't won't spend much time on stylesheets, but I will explain the purpose of 
 &nbsp;
 
 `reset.css` uses [Josh W Comeau's "A Modern CSS Reset"](https://www.joshwcomeau.com/css/custom-css-reset/). Since this stylesheet will be included everywhere, I appended this to the bottom:
+
 ```css
 html, body {
     height: 100%;
@@ -88,6 +244,7 @@ For adding solid-color scalable graphics I recommend using svgs. They don't lose
 &nbsp;
 
 An svg file might look like this:
+
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg"
 viewBox="0 0 98 96"
@@ -99,6 +256,7 @@ fill="#d0d0d0"/></svg>
 <!-- using an HTML img tag -->
 <img src="path_to_my_svg"></img>
 ```
+
 We care about the parameters: **viewBox**, **width**, **height**, and **fill**. If your svg has no viewBox parameter you should add it and set the value to `"0 0 width, height"`. The viewBox parameter defines the visible region of our svg; if you were to modify the width or height without it, the svg would be clipped. Width and height do what you might expect, and fill takes a color as a hex color code.
 
 &nbsp;
@@ -110,6 +268,7 @@ GitHub Pages serves your website through the `index.html` in the `root/` directo
 &nbsp;
 
 To move `dist/` files into that branch I created a bash script:
+
 ```bash
 #!/usr/bin/env bash
 
@@ -141,6 +300,7 @@ else
     exit 1
 fi
 ```
+
 To summarize: this script will create a new empty branch called `gh-pages`, deleting the old branch, checkout the files the `dist/` directory of the development branch, move them to `root/`, then push to and *replace* the remote branch of the same name.
 
 &nbsp;
