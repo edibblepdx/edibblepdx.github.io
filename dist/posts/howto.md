@@ -221,39 +221,48 @@ if (title) {
 ```javascript
 import fm from 'front-matter';
 
-const posts = [/* Post Filenames */];
-
-posts.forEach(append);
-
-function append(title) {
-    const t = title;
-    fetch('posts/' + title  + '.md')
-        .then((response) => {
-            return response.text();
-        })
-        .then((text) => {
-            const content = fm(text);
-            const template = document.getElementById('listItem');
-            const clone = template.content.cloneNode(true);
-
-            const anchor = clone.querySelector('a');
-            anchor.href = 'post.html?title=' + t;
-
-            const title = clone.querySelector('#post-title');
-            title.textContent = content.attributes.title;
-
-            const date = clone.querySelector('#post-date')
-            date.textContent = content.attributes.date;
-
-            const summary = clone.querySelector('#post-summary');
-            summary.textContent = content.attributes.summary;
-
-            document.getElementById('list').appendChild(clone);
-        })
-        .catch((err) => {
-            console.error(err);
-        })
+async function getPosts() {
+    const respose = await fetch('posts/posts.json')
+    const posts = await respose.json();
+    return posts;
 }
+
+async function appendPosts() {
+    const posts = await getPosts();
+    for (const title of posts) {
+        await append(title);
+    }
+}
+
+async function append(title) {
+    const t = title;
+    try {
+        const response = await fetch('posts/' + t + '.md')
+        const text = await response.text();
+
+        const content = fm(text);
+        const template = document.getElementById('listItem');
+        const clone = template.content.cloneNode(true);
+
+        const anchor = clone.querySelector('a');
+        anchor.href = 'post.html?title=' + t;
+
+        const title = clone.querySelector('#post-title');
+        title.textContent = content.attributes.title;
+
+        const date = clone.querySelector('#post-date')
+        date.textContent = content.attributes.date;
+
+        const summary = clone.querySelector('#post-summary');
+        summary.textContent = content.attributes.summary;
+
+        document.getElementById('list').appendChild(clone);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+appendPosts();
 ```
 
 ```html
@@ -301,7 +310,7 @@ GitHub Pages serves your website through the `index.html` in the `root/` directo
 
 &nbsp;
 
-To move `dist/` files into that branch I created a bash script:
+To move the `dist/` files into that branch I created a bash script:
 
 ```bash
 #!/usr/bin/env bash
@@ -349,11 +358,11 @@ GitHub Pages also uses Jekyll by default. This can cause problems if you aren't 
 
 # Creating a New Post
 
-Creating a new post is almost as simple as creating a new markdown file. It isn't exactly that easy, because we still need to direct towards it. I'm not sure of a method to search a filesystem through the web so I settled for maintaining an ordered list of all posts in `post.js` and using `fetch()` since we don't have access to Node's filesystem. Thus, creating a new post is as simple as creating a new markdown file and adding the filename to the front of the ordered list.
+Creating a new post is almost as simple as creating a new markdown file. It isn't exactly that easy, because we still need to direct towards it. I'm not sure of a method to search a filesystem through the web so I settled for maintaining an ordered list of all posts in `post.json` and using `fetch()` since we don't have access to Node's filesystem. Thus, creating a new post is as simple as creating a new markdown file and adding the filename to the front of the ordered list.
 
 &nbsp;
 
-Once you've dealt with that minor inconvenience, you're good to go. You can also run this site with a local server and see the result as you write the post in markdown. The homepage will fetch all the posts and read their metadata as it fills in the list. When you click on a post it will fetch it again and parse the markdown content. A markdown file might light like this:
+Once you've dealt with that minor inconvenience, you're good to go. You can also run this site with a local server and see the result as you write the post in markdown. The homepage will fetch all the posts and read their metadata as it fills in the list. When you click on a post it will fetch it again and parse the markdown content. A markdown file might look like this:
 
 ```yaml
 ---
