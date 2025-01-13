@@ -126,9 +126,7 @@ All `.html` pages will mimic this basic layout. Using CSS Grid, `<main>` will be
 </html>
 ```
 
-# index.html
-# post.html
-# resume.html
+&nbsp;
 
 # Stylesheets
 I won't won't spend much time on stylesheets, but I will explain the purpose of each one in the order that I include them in each page. If you want a reference, [MDN Web Docs](https://developer.mozilla.org/en-US/) is a good resource.
@@ -271,11 +269,6 @@ function append(title) {
 </div>
 ```
 
-```html
-    <script type="module" src="scripts/file.js"></script>
-</html>
-```
-
 &nbsp;
 
 # Scalable Vector Graphics
@@ -351,3 +344,26 @@ If you use this method, do not keep important files in the remote branch `gh-pag
 &nbsp;
 
 GitHub Pages also uses Jekyll by default. This can cause problems if you aren't using Jekyll. The simple fix is to create a new file: `.nojekyll`. You might have noticed that Jekyll will cause your markdown files to be served at `root/posts/title` instead of `root/posts/title.md`. I personally did not want this behavior.
+
+&nbsp;
+
+# Creating a New Post
+
+Creating a new post is almost as simple as creating a new markdown file. It isn't exactly that easy, because we still need to direct towards it. I'm not sure of a method to search a filesystem through the web so I settled for maintaining an ordered list of all posts in `post.js` and using `fetch()` since we don't have access to Node's filesystem. Thus, creating a new post is as simple as creating a new markdown file and adding the filename to the front of the ordered list.
+
+&nbsp;
+
+Once you've dealt with that minor inconvenience, you're good to go. You can also run this site with a local server and see the result as you write the post in markdown. The homepage will fetch all the posts and read their metadata as it fills in the list. When you click on a post it will fetch it again and parse the markdown content. A markdown file might light like this:
+
+```yaml
+---
+title: title
+data: date
+summary: summary
+---
+content
+```
+
+# Conclusion
+
+At this point you probably don't have a completed website, but you should have some idea of how to get there. You've also learned how you can serve files through the web without the use of Node.js. And this should have also showed you how can make a blog & portfolio website with dynamic content generation from scratch (minus borrowing a markdown parser) and host it without any cost. I appreciate you if you've read this far.
