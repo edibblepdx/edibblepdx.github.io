@@ -108,7 +108,12 @@ p code {
 p a {
     color: var(--soft-white);
 }
+.footer {
+    display: block;
+    color: var(--soft-white);
+    text-align: center;
+}
 /* Testing */
 .pad-scroll {
-    padding-bottom: 50rem;
+    padding-bottom: 5rem;
 }
