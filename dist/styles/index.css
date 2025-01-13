@@ -19,23 +19,22 @@ main > div {
     align-self: stretch;
 }
 /* might interfere with navbar */
-.list ul, ol {
-    list-style: none;
+#list ul, ol {
     margin: 0;
     padding: 0;
 }
-.list li {
-    padding: 1rem;
+#list li {
+    padding: 0;
     margin: none;
+    list-style: none;
+    padding-top: 1rem;
 }
-.list li > a {
+#list li > a {
     display: block;
     color: var(--soft-white);
-    text-align: center;
     text-decoration: none;
-    font-weight: bold;
 }
-.list li::after {
+#list li::after {
     content: '';
     display: block;
     background: radial-gradient(
@@ -43,8 +42,11 @@ main > div {
             rgba(0,0,0,0)
         );
     height: 3px;
-    margin-top: 2rem;
+    margin-top: 1rem;
 }
-.list li:last-child::after {
+#list li:last-child::after {
     display: none;
+}
+.pad-scroll {
+    padding-bottom: 5rem;
 }

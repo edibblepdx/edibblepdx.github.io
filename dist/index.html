@@ -46,27 +46,19 @@
                 </p>
                 <br/><br/>
 <!-- Posts -->
-                <div class="list">
-                    <ul>
-                        <li><a href="post.html?title=test">
-                            <p>test post</p></br>
-                            <p>summary and date here</p>
+                <div id="list">
+                    <ul></ul>
+                    <template id="listItem">
+                        <li><a href="post.html?title=">
+                            <h2 id="post-title"></h2><br/>
+                            <p id="post-summary"></p><br/>
+                            <p id="post-date"></p>
                         </a></li>
-                        <li><a href="post.html?title=test">
-                            <p>test post</p></br>
-                            <p>summary and date here</p>
-                        </a></li>
-                        <li><a href="post.html?title=test">
-                            <p>test post</p></br>
-                            <p>summary and date here</p>
-                        </a></li>
-                        <li><a href="post.html?title=test">
-                            <p>test post</p></br>
-                            <p>summary and date here</p>
-                        </a></li>
-                    </ul>
+                    </template>
                 </div>
             </div>
+            <div class="pad-scroll"></div>
         </main>
     </body>
+    <script src="scripts/list.js"></script>
 </html>

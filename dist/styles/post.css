@@ -98,6 +98,16 @@ pre {
     margin-top: 20px;
     margin-bottom: 20px;
 }
+p code {
+    background-color: #2f2f2f;
+    border-radius: 4px; 
+    padding: 0.2em; 
+    font-family: monospace; 
+    font-size: 0.8em; 
+}
+p a {
+    color: var(--soft-white);
+}
 /* Testing */
 .pad-scroll {
     padding-bottom: 50rem;
