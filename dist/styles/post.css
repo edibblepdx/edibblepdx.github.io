@@ -113,7 +113,8 @@ p a {
     color: var(--soft-white);
     text-align: center;
 }
-img {
+/* images within the text */
+main img {
     padding-left: 3rem;
     padding-right: 3rem;
 }
