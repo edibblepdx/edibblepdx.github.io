@@ -10,7 +10,7 @@ The internet is, in my opinion, by far the easiest means of sharing ideas and pr
 
 &nbsp;
 
-My personal goal for this website is to share my projects, provide and interactive resume to potential employers, and give myself a somewhat informal environment to talk about things that I like or have done. I don't expect to post often, but perhaps expect me to share new projects, interesting math topics, personal interests, or just some short introspective thoughts. I learned a lot in planning and creating this website so I wanted to share that process to perhaps help others and to solidify my own personal understanding.
+My personal goal for this website is to share my projects, provide and interactive resume to potential employers, and give myself a somewhat informal environment to talk about things that I like or have done. I don't expect to post often, but perhaps expect me to share new projects, interesting math topics, personal interests, or just some short introspective thoughts. I learned a lot in planning and creating this website so I wanted to share that process as my first post to perhaps help others and to solidify my own personal understanding.
 
 &nbsp;
 
