@@ -4237,8 +4237,8 @@
 	var fm = /*@__PURE__*/getDefaultExportFromCjs(frontMatterExports);
 
 	async function getPosts() {
-	    const respose = await fetch('posts/posts.json');
-	    const posts = await respose.json();
+	    const response = await fetch('posts/posts.json');
+	    const posts = await response.json();
 	    return posts;
 	}
 

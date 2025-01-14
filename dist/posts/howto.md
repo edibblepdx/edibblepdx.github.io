@@ -10,7 +10,7 @@ The internet is, in my opinion, by far the easiest means of sharing ideas and pr
 
 &nbsp;
 
-My personal goal for this website is to share my projects, provide and interactive resume to potential employers, and give myself a somewhat informal environment to talk about things that I like or have done. I don't expect to post often, but perhaps expect me to share new projects, interesting math topics, personal interests, or just some short introspective thoughts. I learned a lot in planning and creating this website so I wanted to share that process as my first post to perhaps help others and to solidify my own personal understanding.
+My personal goal for this website is to share my projects, provide an interactive resume to potential employers, and give myself a somewhat informal environment to talk about things that I like or have done. I don't expect to post often, but perhaps expect me to share new projects, interesting math topics, personal interests, or just some short introspective thoughts. I learned a lot in planning and creating this website so I wanted to share that process as my first post to perhaps help others and to solidify my own personal understanding.
 
 &nbsp;
 
@@ -109,7 +109,7 @@ export default [
 
 # Basic HTML Layout
 
-All `.html` pages will mimic this basic layout. Using CSS Grid, `<main>` will be split into (usually) three columns and may also be split into rowns. Each `<div>` elevement we can place in the center column. This layout is mobile phone friendly and easy to read.
+All `.html` pages will mimic this basic layout. Using CSS Grid, `<main>` will be split into (usually) three columns and may also be split into rows. Each `<div>` element we can place in the center column. This layout is mobile phone friendly and easy to read.
 
 ```html
 <!DOCTYPE html>
@@ -184,7 +184,7 @@ html, body {
 
 # Scripts
 
-This site doesn't have a database, nor does it have access to Node's filesystem. In order to fill content dynamically from external files we need to use `fetch()`. `fetch()` is a JavaScript interface for making HTTP requests. It returns a promise that is fullfilled with a response object. A promise, garuntees that the value will be provided sometime in the future.
+This site doesn't have a database, nor does it have access to Node's filesystem. In order to fill content dynamically from external files we need to use `fetch()`. `fetch()` is a JavaScript interface for making HTTP requests. It returns a promise that is fulfilled with a response object. A promise, guarantees that the value will be provided sometime in the future.
 
 &nbsp;
 
@@ -255,7 +255,7 @@ The first thing we do is to create a new parser using Marked. We include highlig
 
 &nbsp;
 
-Remember that `fetch()` returns a promise. The `then()` method of promise instances takes a callback function and immediately returns a new promise different from the original. We can chain promises with `then()` clauses, where each returned promise represents the completion of one asynchronous step in the chain. With multiple calls to `fetch()` order is not garunteed.
+Remember that `fetch()` returns a promise. The `then()` method of promise instances takes a callback function and immediately returns a new promise different from the original. We can chain promises with `then()` clauses, where each returned promise represents the completion of one asynchronous step in the chain. With multiple calls to `fetch()` order is not guaranteed.
 
 &nbsp;
 
@@ -280,8 +280,8 @@ The second script is `list.js`. The purpose of this script will be to read the m
 import fm from 'front-matter';
 
 async function getPosts() {
-    const respose = await fetch('posts/posts.json')
-    const posts = await respose.json();
+    const response = await fetch('posts/posts.json')
+    const posts = await response.json();
     return posts;
 }
 
@@ -322,7 +322,7 @@ async function append(t) {
 appendPosts();
 ```
 
-As mentioned before with `fetch()` and `then()` clauses, the ordering of our data is not garunteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
+As mentioned before with `fetch()` and `then()` clauses, the ordering of our data is not guaranteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
 
 
 
@@ -369,7 +369,7 @@ To move the `dist/` files into that branch I created a bash script:
 git branch -D gh-pages > /dev/null 2>&1
 git switch --orphan gh-pages && git checkout main dist
 
-# fail if any uncommited changes
+# fail if any uncommitted changes
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
     # append untracked files to .gitignore
     for filename in *; do
@@ -398,7 +398,7 @@ To summarize: this script will create a new empty branch called `gh-pages`, dele
 
 &nbsp;
 
-If you use this method, do not keep important files in the remote branch `gh-pages`; they will be *replaced* by the files in the `dist/` folder of the development branch. This script will fail if there are any uncommited changes, however untracked files will be visible in the new branch so we append them to a `.gitignore`. 
+If you use this method, do not keep important files in the remote branch `gh-pages`; they will be *replaced* by the files in the `dist/` folder of the development branch. This script will fail if there are any uncommitted changes, however untracked files will be visible in the new branch so we append them to a `.gitignore`. 
 
 &nbsp;
 
