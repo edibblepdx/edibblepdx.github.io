@@ -1,10 +1,19 @@
 ---
 title: How to create a free static website using GitHub Pages.
-date: Jan 12, 2025
+date: Jan 13, 2025
 summary: Learn how to create a static website without any frameworks using HTML, CSS, and a few npm packages. We bundle our scripts using Rollup and deploy the site for free using GitHub Pages.
 ---
 
 # Purpose
+
+The internet is, in my opinion, by far the easiest means of sharing ideas and projects. For that reason, I have wanted a portfolio website and it took me until now to create one. The truth is, that I have never been particularly invested in web development, but had still found myself interacting with it because I wanted my friends and family to have easy access to things like machine learning models that I've trained or 3D demo projects. My experience in web dev prior to this website was mostly limited to small single-featured demos, a chat app made in collaboration with another person, unstyled model interfaces made in python with Flask, and iframes for creating WebGL rendering contexts. I learned a lot in planning and creating this website so I wanted to share that process to perhaps help others and to solidify my own personal understanding.
+
+&nbsp;
+
+My personal goal for this website is to share my projects, provide and interactive resume to potential employers, and give myself a somewhat informal environment to talk about things that I like or have done. I don't expect to post often, but perhaps expect me to share new projects, interesting math topics, personal interests, or just some short introspective thoughts.
+
+&nbsp;
+
 # CSS Grid
 
 &nbsp;
@@ -74,6 +83,8 @@ Append this rule to your `package.json` to suppress errors with rollup:
 Create a `rollup.config.js` that looks like this. When you run `rollup --config`, it looks for a predefined config file and executes that. Rollup takes each `input` and bundles it with its imports to create the `output`. You can export an array of bundles.
 
 ```javascript
+/* rollup.config.js */
+
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 
@@ -180,6 +191,8 @@ This site doesn't have a database, nor does it have access to Node's filesystem.
 The first script is `post.js`. The purpose of this script will be to parse markdown files and fill the content of each post. I mentioned previously that `post.html` is boilerplate for a post; its content is empty. Within the `<main>` element of `post.html`, there are two empty `<div>` tags. This script fill those elements dynamically.
 
 ```html
+<!-- post.html -->
+
 <body>
     ...
     <main>
@@ -191,6 +204,8 @@ The first script is `post.js`. The purpose of this script will be to parse markd
 ```
 
 ```javascript
+/* post.js */
+
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
@@ -247,6 +262,8 @@ Remember that `fetch()` returns a promise. The `then()` method of promise instan
 The second script is `list.js`. The purpose of this script will be to read the metadata of each markdown file and append them to an ordered list within anchor elements `<a>` that have an `href` attribute with the value `username.github.io/post.html?title=value`, where `value` is the title of the post. We will use an HTML5 `<template>` for each child of the list. All post titles are stored in a separate `posts.json` so that we don't have to rebundle the script each time a new post is added and we again use front-matter for extracting metadata. 
 
 ```html
+<!-- index.html -->
+
 <ul id="list"></ul>
 <template id="listItem">
     <li><a href="post.html?title=">
@@ -258,6 +275,8 @@ The second script is `list.js`. The purpose of this script will be to read the m
 ```
 
 ```javascript
+/* list.js */
+
 import fm from 'front-matter';
 
 async function getPosts() {
@@ -303,7 +322,7 @@ async function append(t) {
 appendPosts();
 ```
 
-As mentioned before with `then()` clauses, the ordering of our data is not garunteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
+As mentioned before with `fetch()` and `then()` clauses, the ordering of our data is not garunteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
 
 
 
