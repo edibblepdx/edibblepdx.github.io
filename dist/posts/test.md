@@ -10,6 +10,5 @@ This is a paragraph with **bold** text and *italic* text.
 ```javascript
 console.log('This is a code block');
 ```
-&nbsp;
 
 ![image](https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png)

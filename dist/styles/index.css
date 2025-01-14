@@ -19,7 +19,7 @@ main > div {
     align-self: stretch;
 }
 /* might interfere with navbar */
-#list ul, ol {
+#list {
     margin: 0;
     padding: 0;
 }

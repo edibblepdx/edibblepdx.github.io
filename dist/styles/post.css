@@ -113,6 +113,10 @@ p a {
     color: var(--soft-white);
     text-align: center;
 }
+img {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
 /* Testing */
 .pad-scroll {
     padding-bottom: 5rem;

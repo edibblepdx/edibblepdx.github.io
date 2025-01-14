@@ -173,6 +173,23 @@ html, body {
 
 # Scripts
 
+This site doesn't have a database, nor does it have access to Node's filesystem. In order to fill content dynamically from external files we need to use `fetch()`. `fetch()` is a JavaScript interface for making HTTP requests. It returns a promise that is fullfilled with a response object. A promise, garuntees that the value will be provided sometime in the future.
+
+&nbsp;
+
+The first script is `post.js`. The purpose of this script will be to parse markdown files and fill the content of each post. I mentioned previously that `post.html` is boilerplate for a post; its content is empty. Within the `<main>` element of `post.html`, there are two empty `<div>` tags. This script fill those elements dynamically.
+
+```html
+<body>
+    ...
+    <main>
+        <div id="title"></div>
+        <div id="content"></div>
+    </main>
+    ...
+</body>
+```
+
 ```javascript
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
@@ -217,6 +234,27 @@ if (title) {
         marked.parse('# File NULL');
     console.error("ERROR::FILE::NULL");
 }
+```
+
+The first thing we do is to create a new parser using Marked. We include highlight.js for syntax highlighting. Second, we then get the title of the post which was passed as a search parameter similar to `username.github.io/post.html?title=value`, where `title` is the parameter and `value` is the value. Third we use `fetch()` to find the markdown file. Fourth we extract metadata using front-matter. And Fifth we get the `title` and `content` elements by id and use the parser to fill their contents.
+
+&nbsp;
+
+Remember that `fetch()` returns a promise. The `then()` method of promise instances takes a callback function and immediately returns a new promise different from the original. We can chain promises with `then()` clauses, where each returned promise represents the completion of one asynchronous step in the chain. With multiple calls to `fetch()` order is not garunteed.
+
+&nbsp;
+
+The second script is `list.js`. The purpose of this script will be to read the metadata of each markdown file and append them to an ordered list within anchor elements `<a>` that have an `href` attribute with the value `username.github.io/post.html?title=value`, where `value` is the title of the post. We will use an HTML5 `<template>` for each child of the list. All post titles are stored in a separate `posts.json` so that we don't have to rebundle the script each time a new post is added and we again use front-matter for extracting metadata. 
+
+```html
+<ul id="list"></ul>
+<template id="listItem">
+    <li><a href="post.html?title=">
+        <h2 id="post-title"></h2><br/>
+        <p id="post-summary"></p><br/>
+        <p id="post-date"></p>
+    </a></li>
+</template>
 ```
 
 ```javascript
@@ -265,18 +303,11 @@ async function append(t) {
 appendPosts();
 ```
 
-```html
-<div id="list">
-    <ul></ul>
-    <template id="listItem">
-        <li><a href="post.html?title=">
-            <h2 id="post-title"></h2><br/>
-            <p id="post-summary"></p><br/>
-            <p id="post-date"></p>
-        </a></li>
-    </template>
-</div>
-```
+As mentioned before with `then()` clauses, the ordering of our data is not garunteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
+
+
+
+
 
 &nbsp;
 
