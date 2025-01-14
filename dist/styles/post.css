@@ -1,6 +1,6 @@
 main {
     display: grid;
-    grid-template-rows: 15rem 1fr;
+    grid-template-rows: minmax(15rem, auto) 1fr;
     grid-template-columns: 
         minmax(2rem, 1fr) 
         minmax(0, 40rem) 
