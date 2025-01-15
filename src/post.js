@@ -1,10 +1,13 @@
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
+import markedKatex from "marked-katex-extension";
+import { gfmHeadingId, getHeadingList } from "marked-gfm-heading-id";
 import hljs from 'highlight.js';
 import fm from 'front-matter';
 
-const marked = new Marked(
-    markedHighlight({
+const marked = new Marked();
+/* syntax highlighting */
+marked.use(markedHighlight({
         emptyLangClass: 'hljs',
         langPrefix: 'hljs language-',
         highlight(code, lang, info) {
@@ -13,7 +16,35 @@ const marked = new Marked(
         }
     })
 );
+/* LaTeX parsing */
+marked.use(markedKatex({
+        throwOnError: false
+    })
+);
+/* header id's and toc postprocessing hook */
+const options = {
+    hooks: {
+        postprocess(html) {
+            const headings = getHeadingList();
+            headings.map(({id, raw, level}) => {
+                const template = document.getElementById('tocItem');
+                const clone = template.content.cloneNode(true);
 
+                const anchor = clone.querySelector('a');
+                anchor.href = '#' + id;
+                anchor.textContent = raw;
+
+                const li = clone.querySelector('li');
+                li.className = 'h' + level;
+
+                document.getElementById("tocList").appendChild(clone);
+            });
+            return html;
+        }
+    }
+}
+
+const event = new Event('custom-content-loaded');
 let params = new URLSearchParams(document.location.search);
 let title = params.get("title");
 if (title) {
@@ -23,13 +54,23 @@ if (title) {
         })
         .then((text) => {
             let content = fm(text);
+
+            /* title and date */
             document.getElementById('title').innerHTML = 
                 marked.parse(
                     '# ' + content.attributes.title + '\n\n' + 
                     '### ' + content.attributes.date
                 );
+
+            
+            /* (body only) id headings and apply postprocessing */
+            marked.use(gfmHeadingId({prefix: "section-"}), options);
+
+            /* body */
             document.getElementById('content').innerHTML = 
                 marked.parse(content.body);
+
+            dispatchEvent(event);
         })
         .catch((err) => {
             document.getElementById('content').innerHTML = 

@@ -68,10 +68,10 @@ main > nav {
 }
 .toc li {
     margin-left: 1rem;
-    margin-top: 1rem;
+    margin-top: 0.5rem;
 }
 .toc li.active > a {
-    color: var(--color2);
+    color: var(--pink);
     font-weight: 500;
 }
 .toc a {
