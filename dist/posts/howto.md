@@ -16,7 +16,39 @@ My personal goal for this website is to share my projects, provide an interactiv
 
 # CSS Grid
 
-asdf
+I want to bring up CSS Grid first because I essentially designed this site around it. You'll notice that every page on this website is split into three columns (and possibly rows) with the main content in the center. I like this format because I personally feel that it is easy to read and it simplifies viewing for mobile phones. CSS Grid enables such organization without too much hassle. In a parent element set the the display style to `grid` and create the template. 
+
+```css
+main {
+    display: grid;
+    grid-template-rows: minmax(15rem, auto) 1fr;
+    grid-template-columns: minmax(2rem, 1fr) minmax(0, 40rem) minmax(2rem, 1fr);
+}
+```
+
+We can use media queries to change grid sizes or hide elements on small screens.
+
+```css
+/* hide toc on narrow screens */
+@media only screen and (max-width: 40rem) {
+    main {
+        grid-template-columns: minmax(1rem, 1fr) minmax(0, 40rem) minmax(1rem, 1fr);
+    }
+    nav {display: none;}
+}
+```
+
+For child elements, specify the grid row/column in which they belong.
+
+```css
+#title { grid-row: 1; grid-column: 2; }
+main > div { grid-row: 2; grid-column: 2; }
+main > nav { grid-row: 2; grid-column: 3; }
+```
+
+The result for this page is this:
+
+![css-grid](https://i.ibb.co/gTJHgVB/css-grid.png)
 
 &nbsp;
 
@@ -60,12 +92,18 @@ cd website
 npm init
 ```
 
-We require **rollup** for bundling our scripts, **markedjs** for parsing markdown files, **highlight.js** for code syntax highlighting, **marked-highlight** to use highlight.js with markedjs, and **front-matter** to store YAML-style metadata in our markdown files. If you don't want to use npm packages you can instead use a CDN to include the scripts in HTML, or forgo all of these if you want to write all your posts as separate pages in HTML and don't care about syntax highlighting for code. If you get lost, [check out the source code for this website](https://github.com/edibblepdx/edibblepdx.github.io).
+We require **rollup** for bundling our scripts, **markedjs** for parsing markdown files, **highlight.js** for code syntax highlighting, and **front-matter** to store YAML-style metadata in our markdown files. If you don't want to use npm packages you can instead use a CDN to include the scripts in HTML, or forgo all of these if you want to write all your posts as separate pages in HTML and don't care about syntax highlighting for code. If you get lost, [check out the source code for this website](https://github.com/edibblepdx/edibblepdx.github.io).
 
 ```bash
-npm install marked marked-highlight highlight.js front-matter
+npm install marked highlight.js front-matter
 
 npm install rollup @rollup/plugin-commonjs @rollup/plugin-node-resolve --save-dev
+```
+
+I'll also include some markedjs extensions: marked-highlight, marked-katex-extension, and marked-gfm-heading-id. Marked-highlight is necessary to use highlight.js with markedjs and marked-gfm-heading-id is also necessary for the table of contents. Marked-katex-extension lets markdownjs parse KaTeX which is a math typesetting library for the web based on TeX. I use LaTeX a lot for school and other work so of course I included it.
+
+```
+npm install marked-highlight marked-katex-extension marked-gfm-heading-id
 ```
 
 Add this build command to your `package.json` under `scripts`:
@@ -143,6 +181,7 @@ All `.html` pages will mimic this basic layout. Using CSS Grid, `<main>` will be
 &nbsp;
 
 # Stylesheets
+
 I won't won't spend much time on stylesheets, but I will explain the purpose of each one in the order that I include them in each page. If you want a reference, [MDN Web Docs](https://developer.mozilla.org/en-US/) is a good resource.
 
 &nbsp;

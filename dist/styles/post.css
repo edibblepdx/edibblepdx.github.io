@@ -115,8 +115,11 @@ p a {
 }
 /* images within the text */
 main img {
-    padding-left: 3rem;
-    padding-right: 3rem;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 2rem;
+    filter: drop-shadow(10px 10px 3px var(--shadow));
 }
 /* Testing */
 .pad-scroll {
