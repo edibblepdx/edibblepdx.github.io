@@ -1,0 +1,52 @@
+main {
+    display: grid;
+    grid-template-columns: 
+        minmax(2rem, 1fr) 
+        minmax(0, 40rem) 
+        minmax(2rem, 1fr);
+}
+/* squish edge padding on narrower screens */
+@media only screen and (max-width: 40rem) {
+    main {
+        grid-template-columns:
+            minmax(1rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(1rem, 1fr);
+    }
+} 
+main > div {
+    grid-column: 2;
+    align-self: stretch;
+}
+/* might interfere with navbar */
+#list {
+    margin: 0;
+    padding: 0;
+}
+#list li {
+    padding: 0;
+    margin: none;
+    list-style: none;
+    padding-top: 1rem;
+}
+#list li > a {
+    display: block;
+    color: var(--soft-white);
+    text-decoration: none;
+}
+#list li::after {
+    content: '';
+    display: block;
+    background: radial-gradient(
+            var(--soft-white), 
+            rgba(0,0,0,0)
+        );
+    height: 3px;
+    margin-top: 1rem;
+}
+#list li:last-child::after {
+    display: none;
+}
+.pad-scroll {
+    padding-bottom: 5rem;
+}
