@@ -61,7 +61,6 @@ if (title) {
                     '# ' + content.attributes.title + '\n\n' + 
                     '### ' + content.attributes.date
                 );
-
             
             /* (body only) id headings and apply postprocessing */
             marked.use(gfmHeadingId({prefix: "section-"}), options);
@@ -70,7 +69,8 @@ if (title) {
             document.getElementById('content').innerHTML = 
                 marked.parse(content.body);
 
-            dispatchEvent(event);
+            /* let other scripts know that the parser has finished */
+            dispatchEvent(event); 
         })
         .catch((err) => {
             document.getElementById('content').innerHTML = 

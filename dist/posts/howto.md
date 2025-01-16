@@ -1,7 +1,8 @@
 ---
-title: How to create a free static website using GitHub Pages.
-date: Jan 13, 2025
-summary: Learn how to create a static website without any frameworks using HTML, CSS, and a few npm packages. We bundle our scripts using Rollup and deploy the site for free using GitHub Pages.
+title: How I Created a Free Static Website Using GitHub Pages.
+date: Jan 16, 2025
+edited: Jan 16,2025
+summary: Learn how I created a static portfolio & blog website without any frameworks using HTML, CSS, and JavaScript. And utilizing Markedjs to parse markdown files. We bundle our scripts using Rollup and deploy the site for free using GitHub Pages.
 ---
 
 # Purpose
@@ -16,7 +17,11 @@ My personal goal for this website is to share my projects, provide an interactiv
 
 # CSS Grid
 
-I want to bring up CSS Grid first because I essentially designed this site around it. You'll notice that every page on this website is split into three columns (and possibly rows) with the main content in the center. I like this format because I personally feel that it is easy to read and it simplifies viewing for mobile phones. CSS Grid enables such organization without too much hassle. In a parent element set the the display style to `grid` and create the template. 
+I want to bring up CSS Grid first because I essentially designed this site around it. You'll notice that every page on this website is split into three columns (and possibly rows) with the main content in the center. I like this format because I personally feel that it is easy to read and that it simplifies viewing for mobile phones. CSS Grid enables such organization without too much hassle. 
+
+&nbsp;
+
+In a parent element set the the display style to `grid` and create the template. 
 
 ```css
 main {
@@ -92,7 +97,7 @@ cd website
 npm init
 ```
 
-We require **rollup** for bundling our scripts, **markedjs** for parsing markdown files, **highlight.js** for code syntax highlighting, and **front-matter** to store YAML-style metadata in our markdown files. If you don't want to use npm packages you can instead use a CDN to include the scripts in HTML, or forgo all of these if you want to write all your posts as separate pages in HTML and don't care about syntax highlighting for code. If you get lost, [check out the source code for this website](https://github.com/edibblepdx/edibblepdx.github.io).
+We require `rollup` for bundling our scripts, `markedjs` for parsing markdown files, `highlight.js` for code syntax highlighting, and `front-matter` to store YAML-style metadata in our markdown files. If you don't want to use npm packages you can instead use a CDN to include the scripts in HTML, or forgo all of these if you want to write all your posts as separate pages in HTML and don't care about syntax highlighting for code. If you get lost, [check out the source code for this website](https://github.com/edibblepdx/edibblepdx.github.io).
 
 ```bash
 npm install marked highlight.js front-matter
@@ -100,7 +105,7 @@ npm install marked highlight.js front-matter
 npm install rollup @rollup/plugin-commonjs @rollup/plugin-node-resolve --save-dev
 ```
 
-I'll also include some markedjs extensions: marked-highlight, marked-katex-extension, and marked-gfm-heading-id. Marked-highlight is necessary to use highlight.js with markedjs and marked-gfm-heading-id is also necessary for the table of contents. Marked-katex-extension lets markdownjs parse KaTeX which is a math typesetting library for the web based on TeX. I use LaTeX a lot for school and other work so of course I included it.
+I'll also include some markedjs extensions: `marked-highlight`, `marked-katex-extension`, and `marked-gfm-heading-id`. Marked-highlight is necessary to use highlight.js with markedjs and marked-gfm-heading-id is also necessary for the table of contents. Marked-katex-extension lets markdownjs parse KaTeX which is a math typesetting library for the web based on TeX. I use LaTeX a lot for school and other work so of course I included it.
 
 ```
 npm install marked-highlight marked-katex-extension marked-gfm-heading-id
@@ -225,11 +230,13 @@ html, body {
 
 # Scripts
 
-This site doesn't have a database, nor does it have access to Node's filesystem. In order to fill content dynamically from external files we need to use `fetch()`. `fetch()` is a JavaScript interface for making HTTP requests. It returns a promise that is fulfilled with a response object. A promise, guarantees that the value will be provided sometime in the future.
+A lot of the content of this site is filled dynamically, but this site doesn't have a database, nor does it have access to Node's filesystem. In order to fill content dynamically from external files we need to use `fetch()`. `fetch()` is a JavaScript interface for making HTTP requests. It returns a promise that is fulfilled with a response object. A promise, guarantees that the value will be provided sometime in the future. This also means that pages are void of content when the DOM is loaded, so we need to delay operations on that content. For that I used custom JavaScript events.
 
 &nbsp;
 
-The first script is `post.js`. The purpose of this script will be to parse markdown files and fill the content of each post. I mentioned previously that `post.html` is boilerplate for a post; its content is empty. Within the `<main>` element of `post.html`, there are two empty `<div>` tags. This script fill those elements dynamically.
+## post.js
+
+The first script is `post.js`. The purpose of this script will be to parse markdown files and fill the content of each post. I mentioned previously that `post.html` is boilerplate for a post; its content is empty. Within the `<main>` element of `post.html`, there are two empty `<div>` tags. This script fills those elements dynamically.
 
 ```html
 <!-- post.html -->
@@ -246,14 +253,16 @@ The first script is `post.js`. The purpose of this script will be to parse markd
 
 ```javascript
 /* post.js */
-
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
+import markedKatex from "marked-katex-extension";
+import { gfmHeadingId, getHeadingList } from "marked-gfm-heading-id";
 import hljs from 'highlight.js';
 import fm from 'front-matter';
 
-const marked = new Marked(
-    markedHighlight({
+const marked = new Marked();
+/* syntax highlighting */
+marked.use(markedHighlight({
         emptyLangClass: 'hljs',
         langPrefix: 'hljs language-',
         highlight(code, lang, info) {
@@ -262,7 +271,35 @@ const marked = new Marked(
         }
     })
 );
+/* LaTeX parsing */
+marked.use(markedKatex({
+        throwOnError: false
+    })
+);
+/* header id's and toc postprocessing hook */
+const options = {
+    hooks: {
+        postprocess(html) {
+            const headings = getHeadingList();
+            headings.map(({id, raw, level}) => {
+                const template = document.getElementById('tocItem');
+                const clone = template.content.cloneNode(true);
 
+                const anchor = clone.querySelector('a');
+                anchor.href = '#' + id;
+                anchor.textContent = raw;
+
+                const li = clone.querySelector('li');
+                li.className = 'h' + level;
+
+                document.getElementById("tocList").appendChild(clone);
+            });
+            return html;
+        }
+    }
+}
+
+const event = new Event('custom-content-loaded');
 let params = new URLSearchParams(document.location.search);
 let title = params.get("title");
 if (title) {
@@ -272,13 +309,23 @@ if (title) {
         })
         .then((text) => {
             let content = fm(text);
+
+            /* title and date */
             document.getElementById('title').innerHTML = 
                 marked.parse(
                     '# ' + content.attributes.title + '\n\n' + 
                     '### ' + content.attributes.date
                 );
+            
+            /* (body only) id headings and apply postprocessing */
+            marked.use(gfmHeadingId({prefix: "section-"}), options);
+
+            /* body */
             document.getElementById('content').innerHTML = 
                 marked.parse(content.body);
+
+            /* let other scripts know that the parser has finished */
+            dispatchEvent(event);
         })
         .catch((err) => {
             document.getElementById('content').innerHTML = 
@@ -292,15 +339,55 @@ if (title) {
 }
 ```
 
-The first thing we do is to create a new parser using Marked. We include highlight.js for syntax highlighting. Second, we then get the title of the post which was passed as a search parameter similar to `username.github.io/post.html?title=value`, where `title` is the parameter and `value` is the value. Third we use `fetch()` to find the markdown file. Fourth we extract metadata using front-matter. And Fifth we get the `title` and `content` elements by id and use the parser to fill their contents.
+The first thing we do is create a new parser using Marked and enable the `marked-highlight` and `marked-katex-extension` extensions with the `use()` method. I don't want to id the title and date so I enable the `marked-gfm-heading-id` extension later. For now I just create the postprocessing hook that it will eventually use. The purpose of this hook is to append the headings in the body of the post to the table of contents.
 
 &nbsp;
 
-Remember that `fetch()` returns a promise. The `then()` method of promise instances takes a callback function and immediately returns a new promise different from the original. We can chain promises with `then()` clauses, where each returned promise represents the completion of one asynchronous step in the chain. With multiple calls to `fetch()` order is not guaranteed.
+Next, we get the title of the post which was passed as a search parameter similar to `username.github.io/post.html?title=value`, where `title` is the parameter and `value` is the value. I use `fetch()` to find the markdown file, then extract metadata and body using front-matter. I get the `title` and `content` elements by id and use the parser to fill their contents. Once the job is finished, we need to let the toc know that the parser's job is finished by emitting a `custom-content-loaded` message. This is necessary because there is no content on the page when it is loaded; thus we need to delay applying observers.
 
 &nbsp;
 
-The second script is `list.js`. The purpose of this script will be to read the metadata of each markdown file and append them to an ordered list within anchor elements `<a>` that have an `href` attribute with the value `username.github.io/post.html?title=value`, where `value` is the title of the post. We will use an HTML5 `<template>` for each child of the list. All post titles are stored in a separate `posts.json` so that we don't have to rebundle the script each time a new post is added and we again use front-matter for extracting metadata. 
+Remember that `fetch()` returns a promise. The `then()` method of promise instances takes a callback function and immediately returns a new promise different from the original. We can chain promises with `then()` clauses, where each returned promise represents the completion of one asynchronous step in the chain. Importantly, however, with multiple calls to `fetch()` order is not guaranteed.
+
+&nbsp;
+
+## toc.js
+
+The second script is `toc.js`. The table of contents is modified from this [source](https://www.bram.us/2020/01/10/smooth-scrolling-sticky-scrollspy-navigation/) so let me just talk about the parts I changed. Since the post content is filled dynamically, we need to wait for that content to exist on the page before we add the observers. Since JavaScript allows us to create and broadcast custom events, we can just wait for the previous `custom-content-loaded` message to signal that the parser's job has finished.
+
+```javascript
+/* toc.js */
+
+window.addEventListener('custom-content-loaded', () => {
+    let activeElement = null;
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const id = entry.target.getAttribute('id');
+            const navElement = document.querySelector(`nav li a[href="#${id}"]`)
+            if (entry.isIntersecting) {
+                if (activeElement && activeElement !== navElement) {
+                    activeElement.parentElement.classList.remove('active');
+                }
+                navElement.parentElement.classList.add('active');
+                activeElement = navElement;
+            }
+        });
+    });
+
+    // Track all headers that have an `id` applied
+    document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]').forEach((header) => {
+        observer.observe(header);
+    });
+});
+```
+
+The other part that I changed was tracking headers instead of sections. Since the active header won't always be intersecting the screen we need to keep track of both the previous and current active headers.
+
+&nbsp;
+
+## list.js
+
+The third script is `list.js`. The purpose of this script will be to read the metadata of each markdown file and append them to an ordered list within anchor elements `<a>` that have an `href` attribute with the value `username.github.io/post.html?title=value`, where `value` is the title of the post. We will use an HTML5 `<template>` for each child of the list. All post titles are stored in a separate `posts.json` so that we don't have to rebundle the script each time a new post is added and we again use front-matter for extracting metadata. 
 
 ```html
 <!-- index.html -->
@@ -364,10 +451,6 @@ appendPosts();
 ```
 
 As mentioned before with `fetch()` and `then()` clauses, the ordering of our data is not guaranteed. I want each post to be ordered by date with newest at the top, which is how I ordered them in json. To mimic synchronous code we can instead use `async`/`await`. This may also be a more intuitive representation. `await` suspends execution until the promise is either fulfilled or rejected. In practice, this is slower than using a `then()` clause, but it garuntees order. To summarize: we fetch the list of posts, then for each post, clone the template, modify its elements, then append the clone as a new child of the list.
-
-
-
-
 
 &nbsp;
 
