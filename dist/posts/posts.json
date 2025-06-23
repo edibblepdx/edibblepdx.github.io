@@ -1,5 +1,6 @@
 [
+    "lua",
+    "tmap",
     "howto",
-    "test",
-    "hello_world"
+    "test"
 ]
