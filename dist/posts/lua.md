@@ -3,15 +3,15 @@ title: A Language Analysis of Lua
 date: June 22, 2025
 edited: June 22,2025
 summary: >
-    An analysis of Lua's features within the larger ecosystem of programming languages.
+    An analysis of Lua as it relates to some general principles of programming languages.
 ---
 
 # Abstract
 
-In this article, I discuss language features of Lua as they relate to some general principles of programming languages. I will, in places, use some more complex features of Lua, such as the debug library (though Lua provides no actual debugger) and coroutines as they are relevant to other uses of the language, but I will not spend extensive time explaining such topics.
+In this article, I discuss language features of Lua as they relate to some general principles of programming languages. I will, in places, use some more complex features of Lua such as the debug library (though Lua provides no actual debugger), metamethods, and coroutines as they are relevant to other uses of the language, but I will not spend extensive time explaining such topics. I also will not cover the C-API.
 \
 \
-The primary sources for this article are Programming in Lua 4th edition (which concerns Lua 5.3.2), the Lua mailing list archive, the Lua 5.4 manual, and tested in Lua 5.4.7. As such, I will talk about features guaranteed compatible with Lua 5.4.7. More than likely, most of what is written here will also be 5.3, 5.2, and LuaJIT compatible, but I will be using the PUC compiler. If I don't associate a version with a statement it is safe to assume Lua 5.4.7. And any code examples given with `>` preceding will be using the REPL environment.
+The primary sources for this article are the book Programming in Lua 4th edition (which concerns Lua 5.3.2), the Lua mailing list archive, the Lua 5.4 manual, and tested in Lua 5.4.7. As such, I will talk about features guaranteed compatible with Lua 5.4.7. More than likely, most of what is written here will also be 5.3, 5.2, and LuaJIT compatible, but I will be using the PUC compiler. If I don't associate a version with a statement it is safe to assume Lua 5.4.7. And any code examples given with `>` preceding will be using the REPL environment. My solutions to most of the Programming in Lua book exercises and some code examples from the book can be found in this [github repo](https://github.com/edibblepdx/pil-4th). But please, buy the book if you would like to learn more.
 
 &nbsp;
 # Why Lua?
@@ -59,206 +59,202 @@ Lua is one of the fastest languages in the realm of scripting languages. And Lua
 &nbsp;
 # Implementations
 
-Mainline Lua is designed, implemented, and maintained by Roberto Ierusalimschy, Waldemar Celes, and Luiz Henrique de Figueiredo at PUC-Rio University in Brazil since 1993.
+Lua is designed, implemented, and maintained by Roberto Ierusalimschy, Waldemar Celes, and Luiz Henrique de Figueiredo at PUC-Rio University in Brazil since 1993. But Lua is meant to be forked and many other versions of the language exist.
+\
+\
+It is possibly easiest to split Lua along the PUC compiler and the JIT compiler. Lua releases maintain some backwards compatibility but each new version is somewhat comparable to the difference between Python2 and Python3. As such, many use cases may target Lua 5.1 for the widest compatibility and access to the JIT compiler. This is Neovim's approach for example.
+\
+\
+PUC Lua is the standard rolling release of Lua maintained by the team at PUC-Rio University. LuaJIT is solely maintained by Mike Pall since 2005 offering a just-in-time compiler for the language. It is mostly "feature complete" and full offers upwards compatibility to Lua 5.1 with optional support for some Lua 5.2 and 5.3 features. Since LuaJIT 2.1, both PUC Lua and LuaIT are on rolling releases. LuaJIT's FFI library is significantly faster and easier to use than Lua's C-API. Where performance is critical, LuaJIT may be preferred; the game framework Love2D uses LuaJIT, but the handheld system Playdate uses Lua 5.4. A quick example of some features missing in LuaJit are the `_ENV` table and ephemeron tables.
 
-- What are the main implementations of the language available today, and who
-maintains them?
+```lua
+-- determine whether Lua actually implements ephemeron tables
 
-    It's easiest to split Lua along the PUC compiler and the JIT compiler. Lua releases maintain some backwards compatibility but each new version is somewhat comparable to the difference between Python2 and Python3. As such, many use cases may target Lua 5.1 for the widest compatibility and access to the JIT compiler. This is Neovim's approach for example.
-
-    PUC Lua is the standard rolling release of Lua maintained by the team at PUC-Rio University. LuaJIT is solely maintained by Mike Pall since 2005 offering a just-in-time compiler for the language. It is mostly "feature complete" and full offers upwards compatibility to Lua 5.1 with optional support for some Lua 5.2 and 5.3 features. Since LuaJIT 2.1, both PUC Lua and LuaIT are on rolling releases. LuaJIT's FFI library is significantly faster and easier to use than Lua's C-API. Where performance is critical, LuaJIT may be preferred; the game framework Love2D uses LuaJIT, but the handheld system Playdate uses Lua 5.4.
-
-    The `_ENV` table is a good solution to some previously existing issues and newer versions of Lua also have a better garbage collector.
-
-    ```lua
-    -- determine whether Lua actually implements ephemeron tables
-
-    local factory; do
-      local mem = {}                      -- memorizing table
-      setmetatable(mem, { __mode = "k" }) -- weak keys
-      function factory(o)
-        local res = mem[o]
-        if not res then
-        res = (function() return o end)
-        mem[o] = res
-        end
-        return res
-      end
+local factory; do
+  local mem = {}                      -- memorizing table
+  setmetatable(mem, { __mode = "k" }) -- weak keys
+  function factory(o)
+    local res = mem[o]
+    if not res then
+    res = (function() return o end)
+    mem[o] = res
     end
+    return res
+  end
+end
 
-    -- o is a strong reference to k; it is maintained in a
-    -- closure of the function 'factory'. Each key in the
-    -- table 'mem' thus has a strong reference to itself in
-    -- the associated table value.
+-- o is a strong reference to k; it is maintained in a
+-- closure of the function 'factory'. Each key in the
+-- table 'mem' thus has a strong reference to itself in
+-- the associated table value.
 
-    -- now to test if lua implements ephemeron tables
-    local a = {}
-    setmetatable(a, { __gc = function() print("I am being collected") end })
-    factory(a)
-    a = nil
+-- now to test if lua implements ephemeron tables
+local a = {}
+setmetatable(a, { __gc = function() print("I am being collected") end })
+factory(a)
+a = nil
 
-    collectgarbage()
-    --> (Lua 5.4.7) I am being collected
-    --> (Luajit) (nothing)
-    ```
+collectgarbage()
+--> (Lua 5.4.7) I am being collected
+--> (Luajit) (nothing)
+```
 
-    Other versions of Lua are Luau, which is developed and maintained by Roblox since 2005. It is based on Lua 5.2. World of Warcraft and Garry's Mod both use forks Lua 5.1. Factorio uses Lua 5.2.1. Adobe Lightroom uses it's own fork of Lua. And there are many more.
+Other versions of Lua are Luau, which is developed and maintained by Roblox since 2005. It is based on Lua 5.2. World of Warcraft and Garry's Mod both use forks Lua 5.1. Factorio uses Lua 5.2.1. Adobe Lightroom uses it's own fork of Lua. And there are many more.
 
-- What authoritative documentation (reference manuals, etc.) is available for
-the language/implementation?
+&nbsp;
+# Documentation
 
-    The authoritative Lua documentation is the [Lua Reference Manual](https://www.lua.org/manual/). Additionally, the [Programming in Lua](https://www.lua.org/pil/) book is freely available online up to the third edition. The fourth edition describes Lua 5.3 and is available for purchase. If at any point the book disagrees with the reference manual, always trust the reference manual. There is also the [Lua-Users](http://lua-users.org/) site which is independent of the Lua language maintainers and has an archive of the Lua mailing list. The PUC team only owns the lua-users domain and determines where it points to. For forks of Lua, see their documentation.
+The authoritative Lua documentation is the [Lua Reference Manual](https://www.lua.org/manual/). Additionally, the [Programming in Lua](https://www.lua.org/pil/) book is freely available online up to the third edition. The fourth edition describes Lua 5.3 and is available for purchase. If at any point the book disagrees with the reference manual, always trust the reference manual. There is also the [Lua-Users](http://lua-users.org/) site which is independent of the Lua language maintainers and has an archive of the Lua mailing list. The PUC team only owns the lua-users domain and determines where it points to. For forks of Lua, see their documentation.
+\
+\
+Lua is not officially standardized by any formal industry group or government. And there is no external standards body that defines Lua apart from the Lua authors themselves at PUC-Rio University, Brazil. The Lua reference manual serves in place of a standard and the reference implementation is in ANSI C. There are many existing forks of Lua that may not be compatible with each other.
+\
+\
+The official formal grammar of Lua is available in the Lua reference manual in extended BNF. [The Complete Syntax of Lua](https://www.lua.org/manual/5.4/manual.html#9).
 
-- Is the language officially standardized by some industry group or government
-organization? If so, include a pointer to the relevant standards document.
+&nbsp;
+# Compilation
 
-    Lua is not officially standardized by any formal industry group or government. And there is no external standards body that defines Lua apart from the Lua authors themselves at PUC-Rio University, Brazil. The Lua reference manual serves in place of a standard and the reference implementation is in ANSI C. There are many existing forks of Lua that may not be compatible with each other.
+Lua is an interpreted language, but its execution model includes a compilation step to bytecode intermediate representation which is run in the Lua virtual machine. You can also precompile a <em>binary chunk</em> with `luac` to be executed later. The function `loadfile` will compile a chunk and return it as a function. The function `dofile` is an auxiliary function that compiles a chunk then runs it.
 
-- Is the language typically compiled or interpreted? What about the
-implementation you are reporting on here? If the implementation includes
-multiple stages (e.g. compilation to an intermediate code that is interpreted),
-describe this.
+&nbsp;
+# Primitive Types and Expressions
 
-    Lua is an interpreted language, but its execution model includes a compilation step to bytecode intermediate representation which is run in the Lua virtual machine. You can also precompile a <em>binary chunk</em> with `luac` to be executed later. The function `loadfile` will compile a chunk and return it as a function. The function `dofile` is an auxiliary function that compiles a chunk then runs it.
+Lua is dynamically typed. This means that variables do not have types; only values do. There are eight basic types in Lua: nil, boolean, number, string, function, userdata, thread, and table. The userdata type allows arbitrary C data to be stored in Lua variables; they can only be created and manipulated through the C API. Threads represent independent threads of execution and are used to implement coroutines. Tables are the sole data structure in Lua, implemented as heterogeneous associative arrays. Tables can implement sets, records, graphs, trees, etc. Tables may also contain methods and provide the object oriented styles of programming.
 
-- Is there an official formal grammar (e.g. in BNF) for the language? If so,
-include a pointer to this if possible.
+&nbsp;
+## Numbers
 
-    The official formal grammar of Lua is available in the Lua reference manual in extended BNF. [The Complete Syntax of Lua](https://www.lua.org/manual/5.4/manual.html#9).
+Since Lua 5.3 there are two types of numbers: 64-bit integer numbers and double-precision floating-point numbers. Prior to Lua 5.3 floats were the only numeric type. You can compile Lua as <em>Small Lua</em> with the macro `LUA_32BITS` defined. Small Lua is identical to Standard Lua except integers are 32-bit and floats are single-precision. LuaJIT has a different implementation of integers.
+\
+\
+The maximum integer is `2^63-1` and you can receive the value of integer limits through the math library with `math.maxinteger` and `math.mininteger`. In Lua 5.2 the maximum integer representation is `2^53` and there is no math constant since 5.2 doesn't actually have integers. The maximum floating point number is `2^53`.
+\
+\
+Lua will convert a float to an integer if you OR `|` it with zero, but only if it has no fractional part and is within integer range.
 
-#### Primitive types and expressions
+```lua
+> 2^53 | 0 --> 9007199254740992 
+> 3.2  | 0 --> number has no integer representation
+> 2^64 | 0 --> number has no integer representation 
+```
 
-- Does the language use static or dynamic typing?
+&nbsp;
+## Arithmetic Operations
 
-    Lua is dynamically typed. This means that variables do not have types; only values do. There are eight basic types in Lua: nil, boolean, number, string, function, userdata, thread, and table. The userdata type allows arbitrary C data to be stored in Lua variables; they can only be created and manipulated through the C API. Threads represent independent threads of execution and are used to implement coroutines. Tables are the sole data structure in Lua, implemented as heterogeneous associative arrays. Tables can implement sets, records, graphs, trees, etc. Tables may also contain methods and provide the object oriented styles of programming.
+Arithmetic operations in lua <em>wrap around</em> according to the rules of two-complement arithmetic.
 
-- What kinds of primitive numeric types are supported (integers, floats, etc.)?
-What are their ranges and precisions?
+```lua
+> math.maxinteger + 1 == math.mininteger   --> true
+> math.mininteger - 1 == math.maxinteger   --> true
+> -math.mininteger == math.mininteger      --> true
+> math.mininteger // -1 == math.mininteger --> true
+```
 
-    Since Lua 5.3 there are two types of numbers: 64-bit integer numbers and double-precision floating-point numbers. Prior to Lua 5.3 floats were the only numeric type. You can compile Lua as <em>Small Lua</em> with the macro `LUA_32BITS` defined. Small Lua is identical to Standard Lua except integers are 32-bit and floats are single-precision. LuaJIT has a different implementation of integers.
+Dividing a non-zero number by zero gives `inf` which can also be retrieved by `math.huge`. Dividing zero by zero gives `nan`. Floor division by zero results in an error. 
 
-    The maximum integer is `2^63-1` and you can receive the value of integer limits through the math library with `math.maxinteger` and `math.mininteger`. In Lua 5.2 the maximum integer representation is `2^53` and there is no math constant since 5.2 doesn't actually have integers. The maximum floating point number is `2^53`.
+```lua
+> 1 / 0  --> inf
+> -1 / 0 --> -inf
+> 0 / 0  --> -nan
+> 1 // 0 --> attempt to divide by zero
+```
 
-    Lua will convert a float to an integer if you OR `|` it with zero, but only if it has no fractional part and is within integer range.
+`math.huge` is defined to be larger than any other number. `1e309` and larger is equivalent to `inf`.
 
-    ```lua
-    > 2^53 | 0 --> 9007199254740992 
-    > 3.2  | 0 --> number has no integer representation
-    > 2^64 | 0 --> number has no integer representation 
-    ```
+```lua
+> 1e308                 --> 1e+308
+> 1e309                 --> inf 
+> 1e308 < 1 / 0         --> true
+> 1e308 < math.huge     --> true
+> math.huge > math.huge --> false
+```
 
-- What happens if integer operations overflow? What happens on division by zero?
+`nan` is the only value that does not equal itself, unless you are comparing `math.nan` with itself.
 
-    Arithmetic operations in lua <em>wrap around</em> according to the rules of two-complement arithmetic.
+```lua
+> x = 0 / 0
+> x == x               --> false
+> x ~= x               --> true
+> math.nan == math.nan --> true
+```
 
-    ```lua
-    > math.maxinteger + 1 == math.mininteger   --> true
-    > math.mininteger - 1 == math.maxinteger   --> true
-    > -math.mininteger == math.mininteger      --> true
-    > math.mininteger // -1 == math.mininteger --> true
-    ```
+&nbsp;
+## Booleans
 
-    Dividing a non-zero number by zero gives `inf` which can also be retrieved by `math.huge`. Dividing zero by zero gives `nan`. Floor division by zero results in an error. 
+All values are truthful and thus evaluate to `true` except only for `false` and `nil` which evaluate to `false`.
 
-    ```lua
-    > 1 / 0  --> inf
-    > -1 / 0 --> -inf
-    > 0 / 0  --> -nan
-    > 1 // 0 --> attempt to divide by zero
-    ```
+&nbsp;
+## Logical Operations
 
-    `math.huge` is defined to be larger than any other number. `1e309` and larger is equivalent to `inf`.
+The logical operators in Lua are `and`, `or`, and `not`. Binary logical operators `and` and `or` evaluate to one of their operands based on their truth value. This allows for conditional assignment which you may have seen in Python or JavaScript code. This also implements the ternary operator that you may see in C code.
 
-    ```lua
-    > 1e308                 --> 1e+308
-    > 1e309                 --> inf 
-    > 1e308 < 1 / 0         --> true
-    > 1e308 < math.huge     --> true
-    > math.huge > math.huge --> false
-    ```
+```lua
+> nil or 42  --> 42
+> nil and 42 --> nil
+> 42 or 11   --> 42
+> 42 and 11  --> 11
 
-    `nan` is the only value that does not equal itself, unless you are comparing `math.nan` with itself.
+> false and 11 or 42 --> 42
+```
 
-    ```lua
-    > x = 0 / 0
-    > x == x               --> false
-    > x ~= x               --> true
-    > math.nan == math.nan --> true
-    ```
+The unary logical operator `not` is negation. It will convert non-booleans into booleans. The useful idiom is `not not` to retrieve the true value of a non-boolean type.
 
-- How are booleans represented? Are booleans distinct from integers? What values
-are considered "truthy" and "falsy" in conditional tests?
+```lua
+> not not 42 --> true
+```
 
-    All values are truthful and thus evaluate to `true` except only for `false` and `nil` which evaluate to `false`. The logical operators are `and`, `or`, and `not`.
+&nbsp;
+## Strings
 
-    Binary logical operators `and` and `or` evaluate to one of their operands based on their truth value. This allows for conditional assignment which you may have seen in Python or JavaScript code. This also implements the ternary operator that you may see in C code.
+Strings in Lua are enclosed in single quotes `'` or double quotes `"`. You can concatenate strings with the `..` operator. Strings may contain any 8-bit character, including embedded zeros ('\0'). And Lua 5.3 added UTF-8 escape sequences `\u{XXX}`. Lua also includes a small utf8 library for string manipulation.
 
-    ```lua
-    > nil or 42  --> 42
-    > nil and 42 --> nil
-    > 42 or 11   --> 42
-    > 42 and 11  --> 11
+```lua
+> a = "Hello"
+> a .. " World" --> Hello World
+> a             --> Hello
+```
 
-    > false and 11 or 42 --> 42
-    ```
+Long strings are enclosed in double square brackets with any number of matching equal signs between brackets.
 
-    The unary logical operator `not` is negation. It will convert non-booleans into booleans. The useful idiom is `not not` to retrieve the true value of a non-boolean type.
+```lua
+a = [==[
+a long string
+on multiple lines
+]==]
+```
 
-    ```lua
-    > not not 42 --> true
-    ```
+Numbers are coerced into strings.
 
-- How are strings represented? How are basic string operations (substring,
-concatenation, etc.) performed?
+```lua
+print(10 .. 10) --> 1010
+```
 
-    Strings in Lua are enclosed in single quotes `'` or double quotes `"`. You can concatenate strings with the `..` operator. Strings may contain any 8-bit character, including embedded zeros ('\0'). And Lua 5.3 added UTF-8 escape sequences `\u{XXX}`. Lua also includes a small utf8 library for string manipulation.
+And arithmetic on strings converts them to a number.
 
-    ```lua
-    > a = "Hello"
-    > a .. " World" --> Hello World
-    > a             --> Hello
-    ```
+```lua
+> "10" + 3 --> 13
+```
 
-    Long strings are enclosed in double square brackets with any number of matching equal signs between brackets.
+String manipulation is performed with the string library.
 
-    ```lua
-    a = [==[
-    a long string
-    on multiple lines
-    ]==]
-    ```
+```lua
+> string.rep("abc", 3)         --> abcabcabc
+> string.reverse("abc")        --> cba
+> string.lower("ABC")          --> abc
+> string.upper("abc")          --> ABC
+> string.gsub("abc", "b", " ") --> a b
+-- and others --
+```
 
-    Numbers are coerced into strings.
+Strings cannot be indexed. To get a substring use `string.sub`.
 
-    ```lua
-    print(10 .. 10) --> 1010
-    ```
-
-    And arithmetic on strings converts them to a number.
-
-    ```lua
-    > "10" + 3 --> 13
-    ```
-
-    String manipulation is performed with the string library.
-
-    ```lua
-    > string.rep("abc", 3)         --> abcabcabc
-    > string.reverse("abc")        --> cba
-    > string.lower("ABC")          --> abc
-    > string.upper("abc")          --> ABC
-    > string.gsub("abc", "b", " ") --> a b
-    -- and others --
-    ```
-
-    Strings cannot be indexed. To get a substring use `string.sub`.
-
-    ```lua
-    > s = "[in brackets]"
-    > string.sub(s, 2, -2)  --> in brackets
-    > string.sub(s, 1, 1)   --> [
-    > string.sub(s, -1, -1) --> ]
-    ```
+```lua
+> s = "[in brackets]"
+> string.sub(s, 2, -2)  --> in brackets
+> string.sub(s, 1, 1)   --> [
+> string.sub(s, -1, -1) --> ]
+```
 
 - What operators are allowed in expressions? What are any interesting features
 of the precedence and associativity rules for operators (e.g., differences from other languages like C++ or Python)?
@@ -294,7 +290,7 @@ of the precedence and associativity rules for operators (e.g., differences from 
 
     Lua also keeps a <em>global environment</em> at a special index in the C-registry. The global table `_G` is initialized to this value and so is `_ENV`. However, Lua never uses `_G` internally.
 
-#### Functions, binding, scoping
+# Functions, binding, scoping
 
 - What is the syntax for function definitions? What about mutually recursive
 function definitions?
@@ -560,7 +556,7 @@ else; you might want to recall Week 2a lecture notes)?
     print(t.x) --> 42
     ```
 
-#### Statements and Control
+# Statements and Control
 
 - What primitive or atomic statements (i.e. statements that do not have
 sub-statements) does the language provide? Can expressions be used as atomic
@@ -590,15 +586,16 @@ middle of an expression.)
 # Structured Control Statements
 
 &nbsp;
-## > Sequencing
+## Sequencing
 
 The unit of execution in Lua is called a chunk. A chunk is defined as a sequence of statements, where each statement may optionally be followed by a semicolon: `chunk := {stmt [;]}`. A block is a list of statements and is syntactically equivalent to a chunk. A block may be explicitly delimited to produce a single statement: `stmt := do block end`. A chunk may be stored in a file or a string inside the host program. Lua compiles a chunk as an anonymous function with the global environment set as the first upvalue; each Lua program is a function.
 
 &nbsp;
-## > Selection
+## Selection
 
 All control structures have an explicit terminator: end terminates the if, for and while structures; and until terminates the repeat structure. The condition expression of a control structure can result in any value. Recall that Lua treats all values as true except for `false` and `nil`.
-
+\
+\
 Lua has `if` statements:
 
 ```lua
@@ -660,7 +657,7 @@ Logical operators also evaluate to one of their operands. The idiom `x = x or v`
 ```
 
 &nbsp;
-## > Iteration
+## Iteration
 
 Lua has `while`, `repeat`, and `for` control structures related to iteration. `while` repeats its body *while* a condition is true. `repeat` repeats its body *until* a condition is true and will always execute the body at least once.
 
@@ -1018,86 +1015,6 @@ Lua supports heterogeneous, mutable, boxed product types using tables, which can
 
 You can also use semicolons instead of commas which is inherited from older versions of Lua, however seldom used.
 
-- [2x points] What kinds of array and/or dictionary types are supported? Are
-they homogeneous or heterogeneous (i.e., must all indices/values be the same
-type, or can they be different types)? What types of values can be used as
-indices? Can these structures be resized dynamically, or is their size fixed at
-creation time?
-
-    Lua tables are heterogeneous collections implemented as associative arrays. They can hold any value and be indexed by any value, with the exception of `nil`. More precisely, a table value of `nil` is marked for garbage collection. It may be important to know that float indices are converted to integers if they have no fractional part. The environment itself is a table.
-
-    To represent arrays or list in Lua we use a table with integer keys. There is neither a way nor need to declare the size, simply initialize the elements we need:
-
-    ```lua
-    list = {"Alice", 28, "accounting"}
-    -- is equivalent to
-    list = {[1] = "Alice", [2] = 28, [3] = "accounting"}
-    ```
-
-    To store the size of the array or list, it is convention to use an index labeled 'n'. However, recall that uninitialized elements are `nil` such that sequences are terminated. A sequence is defined as a set with indices from 1..n with no holes. Lua provides an operator `#` that will return the length of said sequence. A table with no numeric keys is a sequence with length zero.
-
-    Sequences can be resized and the length operator provides a simple syntax.
-
-    ```lua
-    list = {"Alice", 28, "accounting"}
-    list[#list + 1] = "Oregon"
-    --> {"Alice", 28, "accounting", "Oregon"}
-    list[#list] = nil
-    --> {"Alice", 28, "accounting", nil}
-    --> list[4] now terminates the sequence and will be collected
-    ```
-
-    Lua also has a table library for operating over lists and sequences. It could be called the sequence or list library but the original name is maintained. It provides operations such as inserting, removing, or moving values within sequences.
-
-    ```lua
-    list = {"Alice", 28, "accounting"}
-    table.insert(list, "Oregon")
-    --> {"Alice", 28, "accounting", "Oregon"}
-    table.remove(list)
-    --> {"Alice", 28, "accounting", nil}
-    table.move(list, 2, #list, 1)
-    list[#list] = nil
-    --> {28, "accounting", nil, nil}
-    ```
-
-    You may also insert or remove from the front, moving all other elements.
-
-    To represent dictionaries in Lua we use a table with named keys. There is neither a way nor need to declare the size, simply initialize the elements we need:
-
-    ```lua
-    {
-      ["name"] = "Alice",
-      ["age"] = 28,
-      ["department"] = "accounting"
-    }
-    ```
-
-    Table traversal is handled with the `pairs` function which will traverse all key-value pairs in an undefined order.
-
-    ```lua
-    t = {10, print, x = 12, k = "hi"}
-    for k, v in pairs(t) do
-      print(k, v)
-    end
-    --> 1   10
-    --> k   hi
-    --> 2   function: 0x420610
-    --> x   12
-    ```
-
-    To traverse sequences we instead use the `ipairs` function which is trivially ordered.
-
-    ```lua
-    t = {10, print, 12, "hi"}
-    for k, v in ipairs(t) do
-      print(k, v)
-    end
-    --> 1   10
-    --> 2   function: 0x420610
-    --> 3   12
-    --> 4   hi
-    ```
-
 &nbsp;
 # Sum types
 
@@ -1160,48 +1077,128 @@ we have used in our interpreters) in this language?
     print(Eval(BinaryOp("+", Literal(1), Literal(2)))) --> 3
     ```
 
-- For products and other data structures, does the language support reference
-equality or structural equality, or both?
+&nbsp;
+# Array and Dictionary Types
 
-    The standard equality operators over objects compare reference equality.
-    But Lua supports structural equality through metamethods.
+Array and dictionary types are implemented through Lua tables. Tables are heterogeneous collections implemented as associative arrays. They can hold any value and be indexed by any value, with the exception of `nil`. More precisely, a table value of `nil` is marked for garbage collection. It may be important to know that float indices are converted to integers if they have no fractional part. The environment itself is a table.
+\
+\
+To represent **arrays** or **lists** in Lua we use a table with integer keys. There is neither a way nor need to declare the size, simply initialize the elements we need:
 
-    ```lua
-    local mt = {
-      __eq = function(a, b)
-        return a.species == b.species
-            and a.length == b.length
-            and a.color == b.color
-      end
-    }
+```lua
+list = {"Alice", 28, "accounting"}
+-- is equivalent to
+list = {[1] = "Alice", [2] = 28, [3] = "accounting"}
+```
 
-    local function newFish(o)
-      o = o or {}
-      setmetatable(o, mt)
-      return o
-    end
+To store the size of the array or list, it is convention to use an index labeled 'n'. However, recall that uninitialized elements are `nil` such that sequences are terminated; a sequence is defined as a set with indices from 1..n with no holes. Lua provides an operator `#` that will return the length of said sequence. A table with no numeric keys is a sequence with length zero.
+\
+\
+Sequences can be resized and the length operator provides a simple syntax.
 
-    local trout = newFish({
-      species = "trout",
-      length = 30,
-      color = "silver",
-    })
+```lua
+list = {"Alice", 28, "accounting"}
+list[#list + 1] = "Oregon"
+--> {"Alice", 28, "accounting", "Oregon"}
+list[#list] = nil
+--> {"Alice", 28, "accounting", nil}
+--> list[4] now terminates the sequence and will be collected
+```
 
-    local identicalTrout = newFish({
-      species = "trout",
-      length = 30,
-      color = "silver",
-    })
+Lua also has a table library for operating over lists and sequences. It could be called the sequence or list library but the original name is maintained. It provides operations such as inserting, removing, or moving values within sequences.
 
-    local salmon = newFish({
-      species = "salmon",
-      length = 28,
-      color = "silver",
-    })
+```lua
+list = {"Alice", 28, "accounting"}
+table.insert(list, "Oregon")
+--> {"Alice", 28, "accounting", "Oregon"}
+table.remove(list)
+--> {"Alice", 28, "accounting", nil}
+table.move(list, 2, #list, 1)
+list[#list] = nil
+--> {28, "accounting", nil, nil}
+```
 
-    assert(trout == identicalTrout)
-    assert(trout == salmon) --> assertion failed!
-    ```
+You may also insert or remove from the front, moving all other elements.
+\
+\
+To represent **dictionaries** in Lua we use a table with named keys. There is neither a way nor need to declare the size, simply initialize the elements we need:
+
+```lua
+{
+  ["name"] = "Alice",
+  ["age"] = 28,
+  ["department"] = "accounting"
+}
+```
+
+Table traversal is handled with the `pairs` function which will traverse all key-value pairs in an undefined order.
+
+```lua
+t = {10, print, x = 12, k = "hi"}
+for k, v in pairs(t) do
+  print(k, v)
+end
+--> 1   10
+--> k   hi
+--> 2   function: 0x420610
+--> x   12
+```
+
+To traverse sequences we instead use the `ipairs` function which is trivially ordered.
+
+```lua
+t = {10, print, 12, "hi"}
+for k, v in ipairs(t) do
+  print(k, v)
+end
+--> 1   10
+--> 2   function: 0x420610
+--> 3   12
+--> 4   hi
+```
+
+&nbsp;
+# Type Equality
+
+The standard equality operators over objects compare reference equality.
+But Lua supports structural equality through metamethods.
+
+```lua
+local mt = {
+  __eq = function(a, b)
+    return a.species == b.species
+        and a.length == b.length
+        and a.color == b.color
+  end
+}
+
+local function newFish(o)
+  o = o or {}
+  setmetatable(o, mt)
+  return o
+end
+
+local trout = newFish({
+  species = "trout",
+  length = 30,
+  color = "silver",
+})
+
+local identicalTrout = newFish({
+  species = "trout",
+  length = 30,
+  color = "silver",
+})
+
+local salmon = newFish({
+  species = "salmon",
+  length = 28,
+  color = "silver",
+})
+
+assert(trout == identicalTrout)
+assert(trout == salmon) --> assertion failed!
+```
 
 &nbsp;
 # Garbage collection
@@ -1520,10 +1517,10 @@ function M.publicFun() end
 return M
 ```
 
-Here are two small modules that you implement as part of exercises 17-1 and 17-2 of Programming in Lua 4th edition.
+Here are two small modules that you implement as part of exercises 17.1 and 17.2 of Programming in Lua 4th edition.
 
 ```lua
--- double ended queue
+-- 17.1 double ended queue
 -- This module provides functions to modify a double
 -- ended queue. This could be made into a class.
 
@@ -1569,7 +1566,7 @@ return deque
 ```
 
 ```lua
--- 17-2 union intersection difference module
+-- 17.2 union intersection difference module
 
 local function union(r1, r2)
   return function(x, y)
@@ -1596,7 +1593,7 @@ return {
 }
 ```
 
-Here is a module implementing breakpoints with the debug library.
+Here is a module implementing breakpoints with the debug library. Exercise 25.7 of Programming in Lua 4th edition.
 
 ```lua
 -- 25.7 Write a library for breakpoints. Include
