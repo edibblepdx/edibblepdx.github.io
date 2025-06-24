@@ -6,48 +6,60 @@ summary: >
     An analysis of Lua's features within the larger ecosystem of programming languages.
 ---
 
-#### Basic information
+# Abstract
 
-- What range of applications/programming tasks is this language intended for?
+In this article, I discuss language features of Lua as they relate to some general principles of programming languages. I will, in places, use some more complex features of Lua, such as the debug library (though Lua provides no actual debugger) and coroutines as they are relevant to other uses of the language, but I will not spend extensive time explaining such topics.
+\
+\
+The primary sources for this article are Programming in Lua 4th edition (which concerns Lua 5.3.2), the Lua mailing list archive, the Lua 5.4 manual, and tested in Lua 5.4.7. As such, I will talk about features guaranteed compatible with Lua 5.4.7. More than likely, most of what is written here will also be 5.3, 5.2, and LuaJIT compatible, but I will be using the PUC compiler. If I don't associate a version with a statement it is safe to assume Lua 5.4.7. And any code examples given with `>` preceding will be using the REPL environment.
 
-    Lua is intended as an embedded language, designed to be integrated into
-    software implemented in C/C++ and other conventional languages. It has also
-    been used to extend Java, C#, Fortran, and even other scripting languages.
-    Lua is used anywhere where a simple, extensible, and portable scripting
-    language can be useful such as embedded systems, mobile devices, the
-    internet, and games. Lua is one of the most popular scripting languages
-    for game development [natively](https://www.satori.org/2009/03/05/the-engine-survey-general-results/)
-    and in the [web](https://gamedevjs.com/survey/2024/#q14). It is the most
-    popular language supporting videogame modding api's. Lua also exists
-    as a <em>glue language</em>, connecting existing high-level components
-    written in statically typed, compiled languages that take the bulk of
-    the CPU time and are unlikely to change during program development.
+&nbsp;
+# Why Lua?
 
-- What (if any) distinctive features does the language have that differentiate
-it from other languages? (What does the language documentation brag about?)
+Lua is intended as an embedded language, designed to be integrated into
+software implemented in C/C++ and other conventional languages. It has also
+been used to extend Java, C#, Fortran, and even other scripting languages.
+Lua is used anywhere where a simple, extensible, and portable scripting
+language can be useful such as embedded systems, mobile devices, the
+internet, and games. Lua is one of the most popular scripting languages
+for game development [natively](https://www.satori.org/2009/03/05/the-engine-survey-general-results/)
+and in the [web](https://gamedevjs.com/survey/2024/#q14). It is the most
+popular language supporting videogame modding api's. Lua also exists
+as a <em>glue language</em>, connecting existing high-level components
+written in statically typed, compiled languages that take the bulk of
+the CPU time and are unlikely to change during program development. Furthermore,
+\
+\
+**Lua is simple.**
+\
+\
+The Lua 5.3 Linux 64-bit executables including standard libraries is 220 KB according to the book. On my machine, the Lua 5.4.7 Linux 64-bit executable including standard libraries is 300 KB and `luac`, which compiles Lua scripts to bytecode for later execution, is 218 KB.
+\
+\
+Lua has 22 keywords and 33 other tokens. Lua 5.3 added bitwise operators and floor division with integers (although modulus was already defined with such behavior). Lua does everything with tables (I mean everything). Tables are like associative arrays. They are neither values nor variables; they are <em>objects</em> dynamically-allocated. As such Lua can only have references or pointers to a table. Lua is also one-indexed which is claimed to be a more natural representation.
+\
+\
+**Lua is portable.**
+\
+\
+Lua can run on all flavors of Unix, Windows, IOS, OS X, IBM mainframes, game consoles, microcontrollers, etx. Lua does not perform conditional compilation and is written in IOS (ANSI) C. That is, if you have a C compiler you can compile Lua.
+\
+\
+**Lua is extensible.**
+\
+\
+Lua implements most of it's own functionality through external libraries. It is easily extensible through it's C api and can interface with external languages like C/C++, Java, C#, and Python. Lua is often used as a tool for developing domain specific languages. [Luarocks](https://luarocks.org/) is the package manager for Lua modules.
+\
+\
+**Lua is efficient.**
+\
+\
+Lua is one of the fastest languages in the realm of scripting languages. And LuaJIT is one of the fastest just-in-time compilers.
 
-    ### Lua is simple.
+&nbsp;
+# Implementations
 
-    The Lua 5.3 Linux 64-bit executables including standard libraries is 220 KB according to the book. On my machine, the Lua 5.4.7 Linux 64-bit executable including standard libraries is 300 KB and `luac`, which compiles Lua scripts to bytecode for later execution, is 218 KB.
-
-    Lua has 22 keywords and 33 other tokens. Lua 5.3 added bitwise operators and floor division with integers (although modulus was already defined with such behavior). Lua does everything with tables (I mean everything). Tables are like associative arrays. They are neither values nor variables; they are <em>objects</em> dynamically-allocated. As such Lua can only have references or pointers to a table. Lua is also one-indexed which is claimed to be a more natural representation.
-
-    ### Lua is portable.
-
-    Lua can run on all flavors of Unix, Windows, IOS, OS X, IBM mainframes, game consoles, microcontrollers, etx. Lua does not perform conditional compilation and is written in IOS (ANSI) C. That is, if you have a C compiler you can compile Lua.
-
-    ### Lua is extensible.
-
-    Lua implements most of it's own functionality through external libraries. It is easily extensible through it's C api and can interface with external languages like C/C++, Java, C#, and Python. Lua is often used as a tool for developing domain specific languages. [Luarocks](https://luarocks.org/) is the package manager for Lua modules.
-
-    ### Lua is efficient.
-
-    Lua is one of the fastest languages in the realm of scripting languages. And LuaJIT is one of the fastest just-in-time compilers.
-
-- Who originally invented the language, and when?
-
-    Lua is designed, implemented, and maintained by Roberto Ierusalimschy, Waldemar
-    Celes, and Luiz Henrique de Figueiredo at PUC-Rio University in Brazil since 1993.
+Mainline Lua is designed, implemented, and maintained by Roberto Ierusalimschy, Waldemar Celes, and Luiz Henrique de Figueiredo at PUC-Rio University in Brazil since 1993.
 
 - What are the main implementations of the language available today, and who
 maintains them?
@@ -91,10 +103,6 @@ maintains them?
     ```
 
     Other versions of Lua are Luau, which is developed and maintained by Roblox since 2005. It is based on Lua 5.2. World of Warcraft and Garry's Mod both use forks Lua 5.1. Factorio uses Lua 5.2.1. Adobe Lightroom uses it's own fork of Lua. And there are many more.
-
-- Which exact implementation/version of the language are you reporting on here?
-
-    I will talk about features guaranteed compatible with Lua 5.4.7. More than likely, most of what is written here will also be 5.2 and LuaJIT compatible, but I will be using the PUC compiler. If I don't associate a version with a statement it is safe to assume Lua 5.4.7. Any code examples given with `>` preceding will be using the REPL environment.
 
 - What authoritative documentation (reference manuals, etc.) is available for
 the language/implementation?
@@ -200,8 +208,6 @@ are considered "truthy" and "falsy" in conditional tests?
     > not not 42 --> true
     ```
 
-# UPDATED__
-# I added encoding as 8-bit
 - How are strings represented? How are basic string operations (substring,
 concatenation, etc.) performed?
 
@@ -538,8 +544,6 @@ function bodies?
     print(c2()) --> 1
     ```
 
-# UPDATED__
-# I changed to say that all arguments are passed by value with variables only containing references to objects
 - How are arguments passed to functions (e.g., by value, by name, something
 else; you might want to recall Week 2a lecture notes)?
 
@@ -555,11 +559,6 @@ else; you might want to recall Week 2a lecture notes)?
     t = {}; a(t)
     print(t.x) --> 42
     ```
-
-### Additional Questions to Answer for Final Report
-
-For scoring, all questions are weighted equally, except for those marked "[2x
-points]" which are weighted twice as much as the rest.
 
 #### Statements and Control
 
@@ -587,404 +586,437 @@ middle of an expression.)
 
     Assignment cannot be performed as a side-effect of evaluating an expression in Lua, only a statement.
 
-- What structured control statements does the language provide for sequencing?
-(For example, blocks and `;` in C++.)
+&nbsp;
+# Structured Control Statements
 
-    The unit of execution in Lua is called a chunk. A chunk is defined as a sequence of statements, where each statement may optionally be followed by a semicolon: `chunk := {stmt [;]}`. A block is a list of statements and is syntactically equivalent to a chunk. A block may be explicitly delimited to produce a single statement: `stmt := do block end`. A chunk may be stored in a file or a string inside the host program. Lua compiles a chunk as an anonymous function with the global environment set as the first upvalue; each Lua program is a function.
+&nbsp;
+## > Sequencing
 
-- What structured control statements does the language provide for selection?
-(For example, `if` and `switch` in C++.)
+The unit of execution in Lua is called a chunk. A chunk is defined as a sequence of statements, where each statement may optionally be followed by a semicolon: `chunk := {stmt [;]}`. A block is a list of statements and is syntactically equivalent to a chunk. A block may be explicitly delimited to produce a single statement: `stmt := do block end`. A chunk may be stored in a file or a string inside the host program. Lua compiles a chunk as an anonymous function with the global environment set as the first upvalue; each Lua program is a function.
 
-    All control structures have an explicit terminator: end terminates the if, for and while structures; and until terminates the repeat structure. The condition expression of a control structure can result in any value. Recall that Lua treats all values as true except for `false` and `nil`.
+&nbsp;
+## > Selection
 
-    Lua has `if` statements:
+All control structures have an explicit terminator: end terminates the if, for and while structures; and until terminates the repeat structure. The condition expression of a control structure can result in any value. Recall that Lua treats all values as true except for `false` and `nil`.
 
-    ```lua
-    local op = "add"
-    if op == "add" then
-      print(1 + 2)
-    elseif op == "mul" then
-      print(1 * 2)
-    else
-      print("no op")
+Lua has `if` statements:
+
+```lua
+local op = "add"
+if op == "add" then
+  print(1 + 2)
+elseif op == "mul" then
+  print(1 * 2)
+else
+  print("no op")
+end
+```
+
+Lua has no match statement, but does support dynamic dispatch with tables (the outer parens are necessary to form an expression):
+
+```lua
+local function dynDispatch(op)
+  return ({
+    ["add"] = function(a, b) return a + b end,
+    ["mul"] = function(a, b) return a * b end,
+    ["sub"] = function(a, b) return a - b end,
+    ["div"] = function(a, b) return a / b end,
+  })[op](1, 2)
+end
+
+print(dynDispatch "add") --> 3
+```
+
+Or a slightly more interesting example:
+
+```lua
+local function dynDispatch(op, ...)
+  return ({
+    ["add"] = function(...)
+      local s = 0
+      for _, v in ipairs { ... } do
+        s = s + v
+      end
+      return s
+    end,
+    ["mul"] = function(...)
+      local s = 1
+      for _, v in ipairs { ... } do
+        s = s * v
+      end
+      return s
+    end,
+  })[op](...)
+end
+
+print(dynDispatch("mul", 1, 2, 3, 4, 5)) --> 120
+```
+
+Logical operators also evaluate to one of their operands. The idiom `x = x or v` is equivalent to `if not x then x = v end`. And the idiom `a and b or c` is equivalent to the ternary operator in C.
+
+```lua
+> true and 1 or 2  --> 1
+> false and 1 or 2 --> 2
+```
+
+&nbsp;
+## > Iteration
+
+Lua has `while`, `repeat`, and `for` control structures related to iteration. `while` repeats its body *while* a condition is true. `repeat` repeats its body *until* a condition is true and will always execute the body at least once.
+
+```lua
+while true do
+  print "forever"
+end
+
+repeat
+  print "forever"
+until false
+```
+
+Lua has two `for` constructs: the *numeric for* and the *generic for*. The generic for concerns iterators so that will be covered in the next section. Loop variables are local to the loop body and modifying them can result in unpredictable behavior. The numeric for has the following syntax:
+
+```lua
+for var = exp1, exp2, exp3 do
+  --something
+end
+```
+
+Where the loop will be executed for each value of `var` from `exp1` to `exp2` with an optional step size in `exp3`. The loop will stop after reaching `exp2`, not before. Meaning that the following loop executes 5 times:
+
+```lua
+for _ = 1, 5 do end
+```
+
+And this executes indefinitely:
+
+```lua
+for _ = 1, math.huge do end
+```
+
+&nbsp;
+# Iterators
+
+Naively, iterators can be implemented using closures. In practice, this involves two functions: the closure itself and a factory.
+
+```lua
+function values(t)
+  local i = 0
+  return function () i = i + 1; return t[i] end
+end
+```
+
+Now when we call an iterator returned from the factory, we receive the next value in the sequence. It's simplest to use the generic `for`.
+
+```lua
+for elements in values(t) do
+  print(element)
+end
+```
+
+The syntax for the generic `for` is
+
+```lua
+for var-list in exp-list do
+  body
+end
+```
+
+The generic `for` first evaluates the expressions after the `in`. These should evaluate to three values maintained by the `for`: the iterator function, invariant state, and the initial value for the control variable (missing values are `nil`). The `for` then calls the iterator with two arguments: the invariant state, and the control variable. If the first return value from the iterator is `nil` (the control variable), the loop terminates. Otherwise, the `for` executes its body and calls the iteration function again.
+\
+\
+Stateless iterators (as their name implies) maintain no state. Therefore we can save the cost of creating new closures and use the same stateless iterator in multiple loops. A stateless iterator generates the next element for the iteration using only the invariant state and the control variable passed to it by the `for`.
+\
+\
+Here is an iterator `fromto` that is equivalent to a numeric for and a stateless version. This is exercise 18-2 from Programming in Lua 4th edition.
+
+```lua
+-- exercise 18-2
+-- add a step parameter to exercise 18-1
+-- if you want to support counting down
+-- could have 2 different functions you possibly return
+--
+-- could probably figure out a better way, but I want
+-- as few operations withing the iterator as possible
+-- and this is what I thought of.
+
+function fromto(n, m, s)
+  s = math.abs(s)   -- s should be positive
+  -- just going to handle 0 step this way and the for does nothing
+  if s == 0 then return function() return nil end end
+  -- counting up
+  if (n <= m) then
+    n, m = n - s, m - s + 1
+    return function()
+      n = (n < m) and (n + s) or nil
+      return n
     end
-    ```
-
-    Lua has no match statement, but does support dynamic dispatch with tables (the outer parens are necessary to form an expression):
-
-    ```lua
-    local function dynDispatch(op, ...)
-      return ({
-        ["add"] = function(a, b) return a + b end,
-        ["mul"] = function(a, b) return a * b end,
-        ["sub"] = function(a, b) return a - b end,
-        ["div"] = function(a, b) return a / b end,
-      })[op](1, 2)
+    -- counting down
+  else
+    n, m = n + s, m + s - 1
+    return function()
+      n = (n > m) and (n - s) or nil
+      return n
     end
+  end
+end
 
-    print(dynDispatch "add") --> 3
-    ```
+print()      -- spacing
+for i in fromto(1, 38, 9) do
+  print(i)   --> 1 10 19 28 37
+end
 
-    Or a slightly more interesting example:
+print()      -- spacing
+for i in fromto(38, 1, 9) do
+  print(i)   --> 38 29 20 11 2
+end
 
-    ```lua
-    local function dynDispatch(op, ...)
-      return ({
-        ["add"] = function(...)
-          local s = 0
-          for _, v in ipairs { ... } do
-            s = s + v
-          end
-          return s
-        end,
-        ["mul"] = function(...)
-          local s = 1
-          for _, v in ipairs { ... } do
-            s = s * v
-          end
-          return s
-        end,
-      })[op](...)
-    end
+-- stateless version
+-- iter is the iterator function
+-- the table {max, s} is the invariant state
+-- n-s is the control variable initial value
+--
+-- this doesn't include the extra checks from the other version
+-- could make a local table of iterator functions if you wanted
+local function iter(t, i)
+  return (i < t.max) and (i + t.s) or nil
+end
 
-    print(dynDispatch("mul", 1, 2, 3, 4, 5)) --> 120
-    ```
+function fromtoagain(n, m, s)
+  s = math.abs(s)   -- s should be positive
+  return iter, { max = m - s + 1, s = s }, n - s
+end
 
-    Logical operators also evaluate to one of their operands. The idiom `x = x or v` is equivalent to `if not x then x = v end`. And the idiom `a and b or c` is equivalent to the ternary operator in C.
+print() -- spacing
+for i in fromtoagain(1, 9, 2) do
+  print(i)
+end
 
-    ```lua
-    > true and 1 or 2  --> 1
-    > false and 1 or 2 --> 2
-    ```
+-- We can use the stateless version again in other loops
+-- without the cost of making new closures. The iterator
+-- maintains no state, it only uses its arguments to
+-- return a value.
+```
 
-- What structured control statements does the language provide for iteration?
-(For example, `for` and `while` in C++.)
+You may have noticed that our iterators so far have not had any loops. The `for` was really the one handling the iteration. True iterators were popular in older versions of Lua before we had the generic `for`. True iterators take some collection and loop over it in their body. This allows for the use of `goto` and `break` statements inside the iterator body.
 
-    Lua has `while`, `repeat`, and `for` control structures related to iteration. `while` repeats its body *while* a condition is true. `repeat` repeats its body *until* a condition is true and will always execute the body at least once.
+Here is a true iterator over subsets implemented in exercise 18-5 from Programming in Lua 4th edition.
 
-    ```lua
-    while true do
-      print "forever"
-    end
+```lua
+-- write a 'true iterator' that traverses
+-- all subsets of a given set
 
-    repeat
-      print "forever"
-    until false
-    ```
+-- 2^n subsets including the empty set
+-- can use a binary representation
+--> either it is in the subset or it is not
+--> iterate from 0 to n_subsets - 1
+--> each binary digit is in or out
 
-    Lua has two `for` constructs: the *numeric for* and the *generic for*. The generic for concerns iterators so that will be covered in the next section. Loop variables are local to the loop body and modifying them can result in unpredictable behavior. The numeric for has the following syntax:
-
-    ```lua
-    for var = exp1, exp2, exp3 do
-      --something
-    end
-    ```
-
-    Where the loop will be executed for each value of `var` from `exp1` to `exp2` with an optional step size in `exp3`. The loop will stop after reaching `exp2`, not before. Meaning that the following loop executes 5 times:
-
-    ```lua
-    for _ = 1, 5 do end
-    ```
-
-    And this executes indefinitely:
-
-    ```lua
-    for _ = 1, math.huge do end
-    ```
-
-- Does the language support a notion of iterators? If so, can programmers define
-their own iterators?
-
-    Naively, iterators can be implemented using closures. In practice, this involves two functions: the closure itself and a factory.
-
-    ```lua
-    function values(t)
-      local i = 0
-      return function () i = i + 1; return t[i] end
-    end
-    ```
-
-    Now when we call an iterator returned from the factory, we receive the next value in the sequence. It's simplest to use the generic `for`.
-
-    ```lua
-    for elements in values(t) do
-      print(element)
-    end
-    ```
-
-    The syntax for the generic `for` is
-
-    ```lua
-    for var-list in exp-list do
-      body
-    end
-    ```
-
-    The generic `for` first evaluates the expressions after the `in`. These should evaluate to three values maintained by the `for`: the iterator function, invariant state, and the initial value for the control variable (missing values are `nil`). The `for` then calls the iterator with two arguments: the invariant state, and the control variable. If the first return value from the iterator is `nil` (the control variable), the loop terminates. Otherwise, the `for` executes its body and calls the iteration function again.
-
-    Stateless iterators (as their name implies) maintain no state. Therefore we can save the cost of creating new closures and use the same stateless iterator in multiple loops. A stateless iterator generates the next element for the iteration using only the invariant state and the control variable passed to it by the `for`.
-
-    Here is an iterator `fromto` that is equivalent to a numeric for and a stateless version. This is exercise 18-2 from Programming in Lua 4th edition.
-
-    ```lua
-    -- exercise 18-2
-    -- add a step parameter to exercise 18-1
-    -- if you want to support counting down
-    -- could have 2 different functions you possibly return
-    --
-    -- could probably figure out a better way, but I want
-    -- as few operations withing the iterator as possible
-    -- and this is what I thought of.
-
-    function fromto(n, m, s)
-      s = math.abs(s)   -- s should be positive
-      -- just going to handle 0 step this way and the for does nothing
-      if s == 0 then return function() return nil end end
-      -- counting up
-      if (n <= m) then
-        n, m = n - s, m - s + 1
-        return function()
-          n = (n < m) and (n + s) or nil
-          return n
-        end
-        -- counting down
-      else
-        n, m = n + s, m + s - 1
-        return function()
-          n = (n > m) and (n - s) or nil
-          return n
-        end
+function allsubsets(t, f)
+  local n = #t
+  local n_subsets = 2 ^ n
+  local subset = {}
+  for i = 0, n_subsets - 1 do
+    for j = 1, n do
+      local include = i >> (n - j) & 1
+      if include == 1 then
+        subset[#subset + 1] = t[j]
       end
     end
+    f(subset)
+    subset = {}
+  end
+end
 
-    print()      -- spacing
-    for i in fromto(1, 38, 9) do
-      print(i)   --> 1 10 19 28 37
-    end
+local a = {}
+-- just going to collect the subsets
+allsubsets({ 1, 2, 3, 4, 5 }, function(t) a[#a + 1] = t end)
+for k, v in ipairs(a) do
+  io.write("{")
+  for j, k in ipairs(v) do
+    io.write(string.format("%d,", k))
+  end
+  io.write("}\n")
+end
+print(string.format("subsets: %d", #a))
+```
 
-    print()      -- spacing
-    for i in fromto(38, 1, 9) do
-      print(i)   --> 38 29 20 11 2
-    end
+Coroutines provide another method of iteration. A coroutine is a line of execution that suspends its execution only when it explicitly requests to be suspended. Coroutines redefine the relationship between caller and callee. Coroutines have their own stack, local variables, and own instruction pointer; they share global variables and pretty much anything else. The idea is to pair a generator with a factory that arranges the generator to run inside a coroutine and creates the iterator function.
 
-    -- stateless version
-    -- iter is the iterator function
-    -- the table {max, s} is the invariant state
-    -- n-s is the control variable initial value
-    --
-    -- this doesn't include the extra checks from the other version
-    -- could make a local table of iterator functions if you wanted
-    local function iter(t, i)
-      return (i < t.max) and (i + t.s) or nil
-    end
-
-    function fromtoagain(n, m, s)
-      s = math.abs(s)   -- s should be positive
-      return iter, { max = m - s + 1, s = s }, n - s
-    end
-
-    print() -- spacing
-    for i in fromtoagain(1, 9, 2) do
-      print(i)
-    end
-
-    -- We can use the stateless version again in other loops
-    -- without the cost of making new closures. The iterator
-    -- maintains no state, it only uses its arguments to
-    -- return a value.
-    ```
-
-    You may have noticed that our iterators so far have not had any loops. The `for` was really the one handling the iteration. True iterators were popular in older versions of Lua before we had the generic `for`. True iterators take some collection and loop over it in their body. This allows for the use of `goto` and `break` statements inside the iterator body.
-
-    Here is a true iterator over subsets implemented in exercise 18-5 from Programming in Lua 4th edition.
-
-    ```lua
-    -- write a 'true iterator' that traverses
-    -- all subsets of a given set
-
-    -- 2^n subsets including the empty set
-    -- can use a binary representation
-    --> either it is in the subset or it is not
-    --> iterate from 0 to n_subsets - 1
-    --> each binary digit is in or out
-
-    function allsubsets(t, f)
-      local n = #t
-      local n_subsets = 2 ^ n
-      local subset = {}
-      for i = 0, n_subsets - 1 do
-        for j = 1, n do
-          local include = i >> (n - j) & 1
-          if include == 1 then
-            subset[#subset + 1] = t[j]
-          end
-        end
-        f(subset)
-        subset = {}
-      end
-    end
-
-    local a = {}
-    -- just going to collect the subsets
-    allsubsets({ 1, 2, 3, 4, 5 }, function(t) a[#a + 1] = t end)
-    for k, v in ipairs(a) do
-      io.write("{")
-      for j, k in ipairs(v) do
-        io.write(string.format("%d,", k))
-      end
-      io.write("}\n")
-    end
-    print(string.format("subsets: %d", #a))
-    ```
-
-    Coroutines provide another method of iteration. A coroutine is a line of execution that suspends its execution only when it explicitly requests to be suspended. Coroutines redefine the relationship between caller and callee. Coroutines have their own stack, local variables, and own instruction pointer; they share global variables and pretty much anything else. The idea is to pair a generator with a factory that arranges the generator to run inside a coroutine and creates the iterator function.
-
-    ```lua
-    -- 24.2 transform exercise 6.5 into a generator for combinations using coroutines
-    --[[
-      for c in combinations({"a", "b", "c"}, 2) do
-        printResult(c)
-      end
-    --]]
+```lua
+-- 24.2 transform exercise 6.5 into a generator for combinations using coroutines
+--[[
+  for c in combinations({"a", "b", "c"}, 2) do
+    printResult(c)
+  end
+--]]
 
 
-    --[[
-      Generate all combinations in a of size m.
-      a:  table
-      n:  number (size of a)
-      m:  number (size of combination)
-      cn: table  (combination)
-    --]]
-    local function combingen(a, n, m, cn)
-      cn = cn or {} -- combination
+--[[
+  Generate all combinations in a of size m.
+  a:  table
+  n:  number (size of a)
+  m:  number (size of combination)
+  cn: table  (combination)
+--]]
+local function combingen(a, n, m, cn)
+  cn = cn or {} -- combination
 
-      --[[
-        If m <= 0 then you have the empty combination.
-        In other words, you have exhausted all elements in a.
+  --[[
+    If m <= 0 then you have the empty combination.
+    In other words, you have exhausted all elements in a.
 
-        If m > n then you have no possible combination in a.
+    If m > n then you have no possible combination in a.
 
-        To avoid unpacking a table each time you could instead
-        add another parameter for the start of the sub-array.
-      --]]
+    To avoid unpacking a table each time you could instead
+    add another parameter for the start of the sub-array.
+  --]]
 
-      if m <= 0 then
-        -- no more combinations?
-        coroutine.yield(cn)
-      elseif m <= n then
-        local tail = { table.unpack(a, 2) }
+  if m <= 0 then
+    -- no more combinations?
+    coroutine.yield(cn)
+  elseif m <= n then
+    local tail = { table.unpack(a, 2) }
 
-        cn[#cn + 1] = a[1]                -- add the first element
-        combingen(tail, n - 1, m - 1, cn) -- generate C(n-1,m-1) combinations of remaining elements
+    cn[#cn + 1] = a[1]                -- add the first element
+    combingen(tail, n - 1, m - 1, cn) -- generate C(n-1,m-1) combinations of remaining elements
 
-        cn[#cn] = nil                     -- remove the first element
-        combingen(tail, n - 1, m, cn)     -- generate C(n-1,m) combinations of remaining elements
-      end
-    end
+    cn[#cn] = nil                     -- remove the first element
+    combingen(tail, n - 1, m, cn)     -- generate C(n-1,m) combinations of remaining elements
+  end
+end
 
-    local function combinations(a, m)
-      return coroutine.wrap(function() combingen(a, #a, m) end)
-    end
+local function combinations(a, m)
+  return coroutine.wrap(function() combingen(a, #a, m) end)
+end
 
-    local function printResult(a)
-      for i = 1, #a do io.write(a[i], " ") end
-      io.write("\n")
-    end
+local function printResult(a)
+  for i = 1, #a do io.write(a[i], " ") end
+  io.write("\n")
+end
 
-    for c in combinations({ "a", "b", "c" }, 2) do
-      printResult(c)
-    end; print()
-    --> a b
-    --> a c
-    --> b c
+for c in combinations({ "a", "b", "c" }, 2) do
+  printResult(c)
+end; print()
+--> a b
+--> a c
+--> b c
 
-    for c in combinations({ 1, 2, 3, 4, 5 }, 3) do
-      printResult(c)
-    end
-    ```
+for c in combinations({ 1, 2, 3, 4, 5 }, 3) do
+  printResult(c)
+end
+```
 
-- Does the language support general `goto` statements or some restricted form of
-them (such as labeled `break`s)?
+&nbsp;
+# goto, break, and return
 
-    Lua has `break`, `return`, and `goto` statements. `break` and `return` allow jumping out of a block and `goto` allows jumping to almost any point in a function. `break` terminates an inner loop (`for`, `repeat`, or `while`). A `return` statement returns values from a function. There is an implicit return at the end of every function. A `return` statement can only occur at the end of a block (or chunk).
+Lua has `break`, `return`, and `goto` statements. `break` and `return` allow jumping out of a block and `goto` allows jumping to almost any point in a function. `break` terminates an inner loop (`for`, `repeat`, or `while`). A `return` statement returns values from a function. There is an implicit return at the end of every function. A `return` statement can only occur at the end of a block (or chunk).
 
-    ```lua
-    function a()
-      if true then return end -- ok
-      return -- not ok
-      do return end -- ok
-      return -- ok
-    end
+```lua
+function a()
+  if true then return end -- ok
+  return -- not ok
+  do return end -- ok
+  return -- ok
+end
 
-    return -- ok
-    ```
+return -- ok
+```
 
-    `goto` jumps execution to a corresponding label. The label syntax is `::label::`. Labels follow normal visibility rules and `goto` cannot jump into a block, neither can they jump into a function, nor can they jump into the scope of a local variable. `goto` can be used to simulate continue or redo constructions and more.
+`goto` jumps execution to a corresponding label. The label syntax is `::label::`. Labels follow normal visibility rules and `goto` cannot jump into a block, neither can they jump into a function, nor can they jump into the scope of a local variable. `goto` can be used to simulate continue or redo constructions and more.
 
-    ```lua
-    while some_condition do
-      ::redo::
-      if other_condition then goto continue end
-      if yet_another_condition then goto redo end
-      ::continue::
-    end
-    ```
+```lua
+while some_condition do
+  ::redo::
+  if other_condition then goto continue end
+  if yet_another_condition then goto redo end
+  ::continue::
+end
+```
 
-- Does the language support exceptions? If so, how are they defined, thrown, and
-caught?
+&nbsp;
+# Errors
 
-    Any unexpected condition that Lua encounters will raise an error. Errors can also be explicitly raised with the function `error` which takes an error message as its first argument. The second argument to `error` is the level, with 1 being the current scope and 2 being the caller. Lua also has an `assert` function that asserts its first argument is not false. The second argument to `assert` is an optional error message.
+Any unexpected condition that Lua encounters will raise an error. Errors can also be explicitly raised with the function `error` which takes an error message as its first argument. The second argument to `error` is the level, with 1 being the current scope and 2 being the caller. Lua also has an `assert` function that asserts its first argument is not false. The second argument to `assert` is an optional error message.
 
-    To handle errors inside Lua code we use `pcall` or protected call and encapsulate the code in a function. If no errors are found it will return `true` and any other values returned by the encapsulated code. Otherwise, it returns `false` and the error message. `pcall` itself never raises an error.
+To handle errors inside Lua code we use `pcall` or "protected call" and encapsulate the code in a function. If no errors are found it will return `true` and any other values returned by the encapsulated code. Otherwise, it returns `false` and the error message. `pcall` itself never raises an error.
 
-    ```lua
-    local ok, msg = pcall(function()
-      -- some code
-      if unexpected_condition then error() end
-      -- some code
-    end)
+```lua
+local ok, msg = pcall(function()
+  -- some code
+  if unexpected_condition then error() end
+  -- some code
+end)
 
-    if ok then
-      -- regular code
-    else
-      -- error handling code
-    end
-    ```
+if ok then
+  -- regular code
+else
+  -- error handling code
+end
+```
 
-    `pcall` destroys part of the stack when it encounters an error. Consequently, if we want a traceback we would rather use `xpcall`, which takes a *message handler function* as its second argument.
+`pcall` destroys part of the stack when it encounters an error. Consequently, if we want a traceback we would rather use `xpcall`, which takes a *message handler function* as its second argument that can create a stack trace before unwinding. Tracebacks are provided by the debug library through the function `debug.traceback` which returns a (potentially long) string containing the traceback.
 
-#### Data structures
+```lua
+local function f()
+  return 1 + nil
+end
 
-- [2x points] What kinds of simple product types (e.g. records, tuples, classes)
-are supported? Are they mutable or immutable (or can individual fields be
-declared mutable or immutable)? Are they boxed or unboxed? Homogeneous or
-heterogeneous (i.e., must all fields be the same type, or can they be different
-types)? Can indices for accessing elements be computed at runtime, or must they
-be static?
+local function handler(err)
+  return debug.traceback("Error: " .. tostring(err), 2)
+end
 
-    Lua supports heterogeneous, mutable, boxed product types using tables, which can act as tuples and records. Tables are boxed as variables in Lua only hold references to objects. Tables are heterogeneous: they hold any value and can be indexed by any value (`boolean`, `number`, `string`, `userdata`, `function`, `thread`, and `table`) with the exception that table keys cannot be `nil` and that a table value of `nil` is marked for garbage collection. Indices may also be computed at runtime as tables are implemented as associative arrays.
+local ok, msg = xpcall(f, handler)
 
-    ```lua
-    -- tuple
-    { "Alice", 28, "accounting" }
+if not ok then
+  print(msg)
+end
+--> Error: test.lua:2: attempt to perform arithmetic on a nil value
+--> stack traceback:
+-->     test.lua:2: in function <test.lua:1>
+-->     [C]: in function 'xpcall'
+-->     test.lua:9: in main chunk
+-->     [C]: in ?
+```
 
-    -- record
-    {
-      ["name"] = "Alice",
-      ["age"] = 28,
-      ["department"] = "accounting"
-    }
+When a coroutine raises an error, it does not unwind its stack. This means that we can inspect it after an error. The traceback does not go through the call to `resume` since the coroutine and the main program run in different stacks.
 
-    -- equivalent record syntax but less general
-    -- (i.e. keys in this form must be valid identifiers)
-    {
-      name = "Alice",
-      age = 28,
-      department = "accounting"
-    }
-    ```
+```lua
+local function f() error() end
+local co = coroutine.create(f)
+print(coroutine.resume(co)) --> false nil
+print(debug.traceback(co))
+--> stack traceback:
+-->     [C]: in function 'error'
+-->     test.lua:2: in function <test.lua:1>
+```
 
-    You can also use semicolons instead of commas which is inherited from older versions of Lua, however seldom used.
+&nbsp;
+# Product Types
+
+Lua supports heterogeneous, mutable, boxed product types using tables, which can act as tuples and records. Tables are boxed as variables in Lua only hold references to objects. Tables are heterogeneous: they hold any value and can be indexed by any value (`boolean`, `number`, `string`, `userdata`, `function`, `thread`, and `table`) with the exception that table keys cannot be `nil` and that a table value of `nil` is marked for garbage collection. Indices may also be computed at runtime as tables are implemented as associative arrays.
+
+```lua
+-- tuple
+{ "Alice", 28, "accounting" }
+
+-- record
+{
+  ["name"] = "Alice",
+  ["age"] = 28,
+  ["department"] = "accounting"
+}
+
+-- equivalent record syntax but less general
+-- (i.e. keys in this form must be valid identifiers)
+{
+  name = "Alice",
+  age = 28,
+  department = "accounting"
+}
+```
+
+You can also use semicolons instead of commas which is inherited from older versions of Lua, however seldom used.
 
 - [2x points] What kinds of array and/or dictionary types are supported? Are
 they homogeneous or heterogeneous (i.e., must all indices/values be the same
@@ -1066,30 +1098,29 @@ creation time?
     --> 4   hi
     ```
 
-- Can the programmer define sum types (e.g., types composed of multiple
-alternatives), and in particular an option type? If the language doesn't provide
-explicit support for them, how might they be simulated?
+&nbsp;
+# Sum types
 
-    There is no explicit support for sum types in Lua. But since Lua is also dynamically typed we can use tagged tables to somewhat mimic the behavior of a sum type.
+There is no explicit support for sum types in Lua. But since Lua is also dynamically typed we can use tagged tables to somewhat mimic the behavior of a sum type.
 
-    ```lua
-    local b = { t = "string", v = "hello" }
-    local c = { t = "number", v = 42 }
-    local sum_type = {
-      ["string"] = function(v) io.write("I am a string: ", v, "\n") end,
-      ["number"] = function(v) io.write("I am a number: ", v, "\n") end,
-    }
-    sum_type[b.t](b.v) --> I am a string: hello
-    sum_type[c.t](c.v) --> I am a number: 42
-    ```
+```lua
+local b = { t = "string", v = "hello" }
+local c = { t = "number", v = 42 }
+local sum_type = {
+  ["string"] = function(v) io.write("I am a string: ", v, "\n") end,
+  ["number"] = function(v) io.write("I am a number: ", v, "\n") end,
+}
+sum_type[b.t](b.v) --> I am a string: hello
+sum_type[c.t](c.v) --> I am a number: 42
+```
 
-    `nil` can be seen as a built in sum type with any other value. The common idiom in Lua
+`nil` can be seen as a built in sum type with any other value. The common idiom in Lua
 
-    ```lua
-    local a = a or b
-    ```
+```lua
+local a = a or b
+```
 
-    Checks for the existence of a global 'a' and assigns the local 'a' that value if it exists or 'b'. This may be used to bring a global value into local scope which provides faster access to said value simply as a result of Lua's implementation. In general, variable accesses are expanded to `_ENV.name` and since `_ENV` is a table (that you may modify or replace as you please) accessing an absent field returns `nil`. So that if you don't care for a default value you can simply perform direct assignment and the local 'a' will receive that value or `nil`.
+Checks for the existence of a global 'a' and assigns the local 'a' that value if it exists or 'b'. This may be used to bring a global value into local scope which provides faster access to said value simply as a result of Lua's implementation. In general, variable accesses are expanded to `_ENV.name` and since `_ENV` is a table (that you may modify or replace as you please) accessing an absent field returns `nil`. So that if you don't care for a default value you can simply perform direct assignment and the local 'a' will receive that value or `nil`.
 
 - What would be the most idiomatic way to define an AST tree type (like the one
 we have used in our interpreters) in this language?
@@ -1172,35 +1203,44 @@ equality or structural equality, or both?
     assert(trout == salmon) --> assertion failed!
     ```
 
-- Does the language support garbage collection? If so, what type of collector is
-used (by the implementation you're studying)? If not, how is heap memory
-deallocated?
+&nbsp;
+# Garbage collection
 
-    *I apologize, I ran out of time and can't elaborate on weak tables, ephemeron tables, and finalizers.*
+Lua uses an incremental garbage collector that runs interleaved with the interpreter. A garbage collection cycle has four phases: *mark, cleaning, sweep* and *finalization*.
+\
+\
+The **mark phase** begins by marking alive its root set, which is only the C registry (both the main thread and the global environment are defined here). Any object stored in an alive object is reachable by the program and therefore marked as alive too.
+\
+\
+The **cleaning phase** handles finalizers and weak tables. Lua traverses all objects marked for finalization and resurrects those not marked as alive and puts them into a separate list to be used in the finalization phase. Then Lua traverses weak tables and removes from them all entries wherin either the key or value is not marked.
+\
+\
+The **sweep phase** traverse all Lua objects which are maintained in a linked list. If an object is not marked as alive Lua collecs it, otherwise it removes the mark in preparation for then ext cycle.
+\
+\
+In the **finaliztion phase**, Lua calls the finalizers of all objects that were separated in the cleaning phase.
+\
+\
+Lua also has *emergency collection* which will force a full garbage collection cycle when memory allocation fails and try again. There is also a function called `collectgarbage` that allows some control over the garbage collector. Such as stopping or forcing a collection cycle or setting how often to run a cycle.
 
-    Lua uses an incremental garbage collector that runs interleaved with the interpreter. A garbage collection cycle has four phases: *mark, cleaning, sweep* and *finalization*.
+&nbsp;
+# Weak tables, ephemeron tables, finalizers, and the function collectgarbage
 
-    The mark phase begins by marking alive its root set, which is only the C registry (both the main thread and the global environment are defined here). Any object stored in an alive object is reachable by the program and therefore marked as alive too.
+The garbage collector cannot guess what we deem to be garbage. Leftover variables such as in a generic stack program maintain references such that objects are not seen as garbage by Lua. Similarly, any object stored in a global variable is not garbage to Lua. It is up to the programmer to assign nil to these locations so that they can be collected at the end of their lifetime. But what if we want to keep a list of live objects without preventing them from beign collect?
 
-    The cleaning phase handles finalizers and weak tables. Lua traverses all objects marked for finalization and resurrects those not marked as alive and puts them into a separate list to be used in the finalization phase. Then Lua traverses weak tables and removes from them all entries wherin either the key or value is not marked.
+Lua provides weak tables
 
-    The sweep phase traverse all Lua objects which are maintained in a linked list. If an object is not marked as alive Lua collecs it, otherwise it removes the mark in preparation for then ext cycle.
+# Is it possible to have call-by-reference function parameters? If so, how are these specified?
 
-    In the finaliztion phase, Lua calls the finalizers of all objects that were separated in the cleaning phase.
-
-    Lua also has *emergency collection* which will force a full garbage collection cycle when memory allocation fails and try again. There is also a function called `collectgarbage` that allows some control over the garbage collector. Such as stopping or forcing a collection cycle or setting how often to run a cycle.
-
-- Is it possible to have call-by-reference function parameters? If so, how are
-these specified?
-
-    All function parameters are call-by-value in Lua. Variables however only contain references to objects. Objects are functions, tables, userdata, and threads. There is no special syntax to support call-by-reference.
+All function parameters are call-by-value in Lua. Variables however only contain references to objects. Objects are functions, tables, userdata, and threads. There is no special syntax to support call-by-reference.
 
 - Can function values be returned by (other) functions? If so, are there any
 restrictions on this feature?
 
     Functions are first class values in Lua and there are no restrictions on having functions as return values. They can be named or anonymous and closed over variables. And they will be collected by the garbage collector at the end of their lifetime.
 
-#### Type systems
+&nbsp;
+# Type systems
 
 - Does the language support polymorphic or generic types for functions and data
 structures? If so, how are these specified and used?
@@ -1254,408 +1294,403 @@ work?
 
     There is also a typed fork of Lua called Teal.
 
-- Does the language use other kinds of static analysis beyond type checking
-(e.g. checking that all paths return a value, or that all variables are
-initialized before use)?
+&nbsp;
+# Static Analysis
 
-    Lua is a dynamically typed, interpreted language, so many errors are delayed to runtime. However Lua has a strict module `std.strict` that requires all variables (including functions) to be declared through regular assignment, `nil` is fine. `std.strict` returns a proxy table to the given environment. You may need to install the module with Luarocks.
+Lua is a dynamically typed, interpreted language, so many errors are delayed to runtime. However Lua has a strict module `std.strict` that requires all variables (including functions) to be declared through regular assignment, `nil` is fine. `std.strict` returns a proxy table to the given environment. You may need to install the module with Luarocks.
 
-    ```lua
-    -- To use the local environment from this scope.
-    local _ENV = require 'std.strict' (_ENV)
-    -- To use the global environment from this scope.
-    local _ENV = require 'std.strict' (_G)
-    -- Or, prevent all access to global environment.
-    local _ENV = require 'std.strict' {}
+```lua
+-- To use the local environment from this scope.
+local _ENV = require 'std.strict' (_ENV)
+-- To use the global environment from this scope.
+local _ENV = require 'std.strict' (_G)
+-- Or, prevent all access to global environment.
+local _ENV = require 'std.strict' {}
 
-    print(g)
-    --> strict.lua:2: variable 'g' is not declared
-    ```
+print(g)
+--> strict.lua:2: variable 'g' is not declared
+```
 
-    Lua does also prevent unreachable code via `return` statements by requiring that a `return` only occur as the last statement within a block or chunk. Recall that Lua compiles every chunk as an anonymous function so a `return` may also occur as the last statement in your program. This is related to the module system so we will talk about it in a later section.
+Lua does also prevent unreachable code via `return` statements by requiring that a `return` only occur as the last statement within a block or chunk. Recall that Lua compiles every chunk as an anonymous function so a `return` may also occur as the last statement in your program. This is related to the module system so we will talk about it in a later section.
 
-    ```lua
-    function a()
-      if true then return end -- ok
-      return -- not ok
-      do return end -- ok
-      return -- ok
+```lua
+function a()
+  if true then return end -- ok
+  return -- not ok
+  do return end -- ok
+  return -- ok
+end
+
+return -- ok
+```
+
+&nbsp;
+# Object Oriented Programming
+
+Lua tables are like objects in that they have a state, an identity `self`, and life cycles independent of who created them or where they were created. Tables can have methods.
+
+```lua
+Account = { balance = 0 }
+function Account:withdraw(v)
+  self.balance = self.balance - v
+end
+```
+
+The colon is a syntactic facility to add an extra argument or parameter to the function. The following are equivalent:
+
+```lua
+Account.withdraw(Account, 42)
+Account:withdraw(42)
+```
+
+There are no classes in Lua, instead each object may have a prototype. Using the idea of inheritance, if we have two objects A and B, we can make A inherit from B as such:
+
+```lua
+setmetatable(A, { __index = B })
+```
+
+Now, A looks up in B any value or method that it does not have. And the result is essentially the following if A lacks an operation:
+
+```lua
+getmetatable(A).__index.operation(A {, v})
+```
+
+If A had redefined the operation then its version would be called, allowing Lua to support dynamic method dispatch. And since Lua is also dynamically typed it supports subtyping and objects can implement the interfaces of other objects.
+\
+\
+Lua can also implement multiple inheritance by using a function as an `__index` metamethod instead. Here we create a constructor for new classes.
+
+```lua
+-- search for method in parents
+local function search(k, plist)
+  for i = 1, #plist do
+    local v = plist[i][k]
+    if v then return v end
+  end
+end
+
+function createClass(...)
+  local c = {}
+  local parents = {...}
+
+  -- class search for absent methods in its list of parents
+  setmetatable(c, { __index = function(t, k)
+    local v = search(k, parents)
+    t[k] = v -- cache
+    return v
+  end})
+
+  -- prepare c to be the metatable of its instances
+  c.__index = c
+
+  -- define new constructor for this class
+  function c:new(o)
+    o = o or {}
+    setmetatable(o, c)
+    return o
+  end
+
+  return c
+end
+```
+
+Lua objects do not provide privacy so if we desire to encapsulate some data with operation on that data without simply appending the name with an underscore to signal that it should be private, we need to use Lua's flexibility. Three methods of privacy are closures, the single method approach, and dual representation. The key idea is to represent an object through two tables: one for its state and one for its operations.
+
+```lua
+-- closures
+function newAccount(initialBalance)
+  local self = { balance = initialBalance }
+  local withdraw = function(v)
+    self.balance = self.balance - v
+  end
+  local deposit = function(v)
+    self.balance = self.balance + v
+  end
+  local getBalance = function()
+    return self.balance
+  end
+  return {
+      withdraw = withdraw,
+      deposit = deposit,
+      getBalance = getBalance,
+  }
+end
+
+-- single method
+function newObject(value)
+  return function (action, v)
+    if action == "get" then return value
+    elseif action == "set" then value = v
+    else error("invalid action", 2)
     end
+  end
+end
 
-    return -- ok
-    ```
+-- dual representation
 
-#### Objects and Modules
+-- Accounts class using dual representation PIL-4th chapter 21.3
+-- comparable cost as the original in terms of time and memory
+-- allows the balance to be private and keep inheritance
+-- requires more work from the garbage collector as old
+-- accounts will not be removed from the balances table
 
-- [2x points] Does the language support Object-Oriented Programming (OOP)
-explicitly, or provide a way to simulate it? If so, how are objects defined? Is
-there a way to encapsulate object data? Is there support for dynamic method
-dispatch? Is there support for inheritance and sub-typing?
+local balance = {}
 
-    Lua tables are like objects in that they have a state, an identity `self`, and life cycles independent of who created them or where they were created. Tables can have methods.
+Account = {}
 
-    ```lua
-    Account = { balance = 0 }
-    function Account:withdraw(v)
-      self.balance = self.balance - v
+function Account:withdraw(v)
+  balance[self] = balance[self] - v
+end
+
+function Account:deposit(v)
+  balance[self] = balance[self] + v
+end
+
+function Account:balance()
+  return balance[self]
+end
+
+function Account:new(o)
+  o = o or {}   -- create table if user does not provide one
+  setmetatable(o, self)
+  self.__index = self
+  balance[o] = 0   -- initial balance
+  return o
+end
+
+a = Account:new()
+a:deposit(100.0)
+print(a:balance())
+```
+
+&nbsp;
+# Modules
+
+Modules in Lua are implemented as tables. Particularly, modules are first class values. We load modules with the `require` function which takes a single argument, the module name, and has no special privileges. `require` uses a suite of *searchers* (a function that returns a *loader* or `nil`) to find and load a module. If `require` cannot find a Lua file with the module name it searches for a C library. For a user, a *module* is just some code in Lua or C that can be loaded through the function `require` and that creates and returns a table.
+
+```lua
+local m = require 'mod'
+m.foo()
+
+local f = m.foo
+f()
+
+-- just require a single method
+local f = require 'mod'.foo
+f()
+```
+
+Recall however, that a Lua chunk is compiled as an anonymous function. Typically module code will return a table but modules may instead decide to return other values or have side effects such as creating global variables.
+
+Loaded packages are in the `package.loaded` table. If we try to `require` the same package, `require` will just return the one we already have. We can force a reload of the package by removing it from `package.loaded` (set the value to `nil`) and allow it to be garbage collected.
+
+A module can return a package in multiple ways. Some common ones are
+
+```lua
+-- common
+local M = {}
+return M
+```
+```lua
+-- export list
+return {
+    a = a
+    b = b
+    c = c
+}
+```
+```lua
+-- directly
+local M = {}
+package.loaded[...] = M -- the varag expression contains the module name
+```
+
+`require` cannot pass values to a module so if you need initialization include an `init` function within your module. If `init` returns your module you can do this in the calling code:
+
+```lua
+M = require 'mod'.init(value)
+```
+
+By default all values in Lua are global so we need to explicitly declare private parts of a module as `local`.
+
+```lua
+local M = {}
+local function privateFun() end
+function M.publicFun() end
+return M
+```
+
+Here are two small modules that you implement as part of exercises 17-1 and 17-2 of Programming in Lua 4th edition.
+
+```lua
+-- double ended queue
+-- This module provides functions to modify a double
+-- ended queue. This could be made into a class.
+
+local deque = {}
+
+function deque.listNew()
+  return { first = 0, last = -1 }
+end
+
+-- deque.list = listNew()
+
+function deque.pushFirst(list, value)
+  local first = list.first - 1
+  list.first = first
+  list[first] = value
+end
+
+function deque.pushLast(list, value)
+  local last = list.last + 1
+  list.last = last
+  list[last] = value
+end
+
+function deque.popFirst(list)
+  local first = list.first
+  if first > list.last then error("list is empty") end
+  local value = list[first]
+  list[first] = nil   -- to allow garbage collection
+  list.first = first + 1
+  return value
+end
+
+function deque.popLast(list)
+  local last = list.last
+  if list.first > last then error("list is empty") end
+  local value = list[last]
+  list[last] = nil   -- to allow garbage collection
+  list.last = last - 1
+  return value
+end
+
+return deque
+```
+
+```lua
+-- 17-2 union intersection difference module
+
+local function union(r1, r2)
+  return function(x, y)
+    return r1(x, y) or r2(x, y)
+  end
+end
+
+local function intersection(r1, r2)
+  return function(x, y)
+    return r1(x, y) and r2(x, y)
+  end
+end
+
+local function difference(r1, r2)
+  return function(x, y)
+    return r1(x, y) and not r2(x, y)
+  end
+end
+
+return {
+  union        = union,
+  intersection = intersection,
+  difference   = difference,
+}
+```
+
+Here is a module implementing breakpoints with the debug library.
+
+```lua
+-- 25.7 Write a library for breakpoints. Include
+--
+-- setbreakpoint(function, line) --> returns handle
+-- removebreakpoint(handle)
+--
+-- We specify a breakpoint by a function and a line inside that function.
+-- When the program hits a breakpoint, the library should call debug.debug.
+-- (Use a line hook for a basic implementation. Use a call hook that enables
+-- the line hook only when running the target function for a more efficient
+-- implementation)
+
+-- Must type 'cont' inside debug.debug to finish the debug function not ctrl-d
+
+local M = {}
+
+--[[
+  Table of breakpoints
+  key: function
+  value: Table {
+    key: handle as an auto-incrementing number
+    value: line number
+    ...
+    n: number of breakpoints in this function
+  }
+--]]
+local breakpoints = {}
+
+--[[
+  Set a breakpoint
+  -> handle: string
+  func: function
+  line: number
+--]]
+local count = 0 -- auto-incrementing handle
+function M.setbreakpoint(func, line)
+  if type(func) ~= "function" then
+    error("bad argument 1 to setbreakpoint: expected function", 2)
+  end
+  if type(line) ~= "number" then
+    error("bad argument 2 to setbreakpoint: expected number", 2)
+  end
+  count = count + 1
+
+  local bp = breakpoints[func] or {}
+  bp[count] = line
+  bp.n = (bp.n or 0) + 1
+  breakpoints[func] = bp
+
+  return count
+end
+
+--[[
+  Remove a breakpoint
+  handle: string
+--]]
+function M.removebreakpoint(handle)
+  for _, bps in pairs(breakpoints) do
+    if bps[handle] then
+      bps[handle] = nil
+      bps.n = bps.n - 1
     end
-    ```
+  end
+end
 
-    The colon is a syntactic facility to add an extra argument or parameter to the function. The following are equivalent:
+local callhook
 
-    ```lua
-    Account.withdraw(Account, 42)
-    Account:withdraw(42)
-    ```
+local function linehook()
+  local info = debug.getinfo(2, "fl")
 
-    There are no classes in Lua, instead each object may have a prototype. Using the idea of inheritance, if we have two objects A and B, we can make A inherit from B as such:
-
-    ```lua
-    setmetatable(A, { __index = B })
-    ```
-
-    Now, A looks up in B any value or method that it does not have. And the result is essentially the following if A lacks an operation:
-
-    ```lua
-    getmetatable(A).__index.operation(A {, v})
-    ```
-
-    If A had redefined the operation then its version would be called, allowing Lua to support dynamic method dispatch. And since Lua is also dynamically typed it supports subtyping and objects can implement the interfaces of other objects.
-
-    Lua can also implement multiple inheritance by using a function as an `__index` metamethod instead. Here we create a constructor for new classes.
-
-    ```lua
-    -- search for method in parents
-    local function search(k, plist)
-      for i = 1, #plist do
-        local v = plist[i][k]
-        if v then return v end
+  local bps = breakpoints[info.func]
+  if bps and bps.n > 0 then
+    for handle, line in pairs(bps) do
+      if info.currentline == line then
+        print(string.format("breakpoint found: %d", handle))
+        debug.debug()
       end
     end
-
-    function createClass(...)
-      local c = {}
-      local parents = {...}
-
-      -- class search for absent methods in its list of parents
-      setmetatable(c, { __index = function(t, k)
-        local v = search(k, parents)
-        t[k] = v -- cache
-        return v
-      end})
-
-      -- prepare c to be the metatable of its instances
-      c.__index = c
-
-      -- define new constructor for this class
-      function c:new(o)
-        o = o or {}
-        setmetatable(o, c)
-        return o
-      end
-
-      return c
-    end
-    ```
-
-    Lua objects do not provide privacy so if we desire to encapsulate some data with operation on that data without simply appending the name with an underscore to signal that it should be private, we need to use Lua's flexibility. Three methods of privacy are closures, the single method approach, and dual representation. The key idea is to represent an object through two tables: one for its state and one for its operations.
-
-    ```lua
-    -- closures
-    function newAccount(initialBalance)
-      local self = { balance = initialBalance }
-      local withdraw = function(v)
-        self.balance = self.balance - v
-      end
-      local deposit = function(v)
-        self.balance = self.balance + v
-      end
-      local getBalance = function()
-        return self.balance
-      end
-      return {
-          withdraw = withdraw,
-          deposit = deposit,
-          getBalance = getBalance,
-      }
-    end
-
-    -- single method
-    function newObject(value)
-      return function (action, v)
-        if action == "get" then return value
-        elseif action == "set" then value = v
-        else error("invalid action", 2)
-        end
-      end
-    end
-
-    -- dual representation
-
-    -- Accounts class using dual representation chapter 21.3
-    -- comparable cost as the original in terms of time and memory
-    -- allows the balance to be private and keep inheritance
-    -- requires more work from the garbage collector as old
-    -- accounts will not be removed from the balances table
-
-    local balance = {}
-
-    Account = {}
-
-    function Account:withdraw(v)
-      balance[self] = balance[self] - v
-    end
-
-    function Account:deposit(v)
-      balance[self] = balance[self] + v
-    end
-
-    function Account:balance()
-      return balance[self]
-    end
-
-    function Account:new(o)
-      o = o or {}   -- create table if user does not provide one
-      setmetatable(o, self)
-      self.__index = self
-      balance[o] = 0   -- initial balance
-      return o
-    end
-
-    a = Account:new()
-    a:deposit(100.0)
-    print(a:balance())
-    ```
-
-- [2x points] Does the language have some form of modules? If so, how are they
-defined? How does the programmer distinguish public vs. private parts of a
-module? How are module definitions imported into other modules?
-
-    Modules in Lua are implemented as tables. Particularly, modules are first class values. We load modules with the `require` function which takes a single argument, the module name, and has no special privileges. `require` uses a suite of *searchers* (a function that returns a *loader* or `nil`) to find and load a module. If `require` cannot find a Lua file with the module name it searches for a C library. For a user, a *module* is just some code in Lua or C that can be loaded through the function `require` and that creates and returns a table.
-
-    ```lua
-    local m = require 'mod'
-    m.foo()
-
-    local f = m.foo
-    f()
-
-    -- just require a single method
-    local f = require 'mod'.foo
-    f()
-    ```
-
-    Recall however, that a Lua chunk is compiled as an anonymous function. Typically module code will return a table but modules may instead decide to return other values or have side effects such as creating global variables.
-
-    Loaded packages are in the `package.loaded` table. If we try to `require` the same package, `require` will just return the one we already have. We can force a reload of the package by removing it from `package.loaded` (set the value to `nil`) and allow it to be garbage collected.
-
-    A module can return a package in multiple ways. Some common ones are
-
-    ```lua
-    -- common
-    local M = {}
-    return M
-    ```
-    ```lua
-    -- export list
-    return {
-        a = a
-        b = b
-        c = c
-    }
-    ```
-    ```lua
-    -- directly
-    local M = {}
-    package.loaded[...] = M -- the varag expression contains the module name
-    ```
-
-    `require` cannot pass values to a module so if you need initialization include an `init` function within your module. If `init` returns your module you can do this in the calling code:
-
-    ```lua
-    M = require 'mod'.init(value)
-    ```
-
-    By default all values in Lua are global so we need to explicitly declare private parts of a module as `local`.
-
-    ```lua
-    local M = {}
-    local function privateFun() end
-    function M.publicFun() end
-    return M
-    ```
-
-    Here are two small modules that you implement as part of exercises 17-1 and 17-2 of Programming in Lua 4th edition.
-
-    ```lua
-    -- double ended queue
-    -- This module provides functions to modify a double
-    -- ended queue. This could be made into a class.
-
-    local deque = {}
-
-    function deque.listNew()
-      return { first = 0, last = -1 }
-    end
-
-    -- deque.list = listNew()
-
-    function deque.pushFirst(list, value)
-      local first = list.first - 1
-      list.first = first
-      list[first] = value
-    end
-
-    function deque.pushLast(list, value)
-      local last = list.last + 1
-      list.last = last
-      list[last] = value
-    end
-
-    function deque.popFirst(list)
-      local first = list.first
-      if first > list.last then error("list is empty") end
-      local value = list[first]
-      list[first] = nil   -- to allow garbage collection
-      list.first = first + 1
-      return value
-    end
-
-    function deque.popLast(list)
-      local last = list.last
-      if list.first > last then error("list is empty") end
-      local value = list[last]
-      list[last] = nil   -- to allow garbage collection
-      list.last = last - 1
-      return value
-    end
-
-    return deque
-    ```
-
-    ```lua
-    -- 17-2 union intersection difference module
-
-    local function union(r1, r2)
-      return function(x, y)
-        return r1(x, y) or r2(x, y)
-      end
-    end
-
-    local function intersection(r1, r2)
-      return function(x, y)
-        return r1(x, y) and r2(x, y)
-      end
-    end
-
-    local function difference(r1, r2)
-      return function(x, y)
-        return r1(x, y) and not r2(x, y)
-      end
-    end
-
-    return {
-      union        = union,
-      intersection = intersection,
-      difference   = difference,
-    }
-    ```
-
-    Here is a module implementing breakpoints with the debug library.
-
-    ```lua
-    -- 25.7 Write a library for breakpoints. Include
-    --
-    -- setbreakpoint(function, line) --> returns handle
-    -- removebreakpoint(handle)
-    --
-    -- We specify a breakpoint by a function and a line inside that function.
-    -- When the program hits a breakpoint, the library should call debug.debug.
-    -- (Use a line hook for a basic implementation. Use a call hook that enables
-    -- the line hook only when running the target function for a more efficient
-    -- implementation)
-
-    -- Must type 'cont' inside debug.debug to finish the debug function not ctrl-d
-
-    local M = {}
-
-    --[[
-      Table of breakpoints
-      key: function
-      value: Table {
-        key: handle as an auto-incrementing number
-        value: line number
-        ...
-        n: number of breakpoints in this function
-      }
-    --]]
-    local breakpoints = {}
-
-    --[[
-      Set a breakpoint
-      -> handle: string
-      func: function
-      line: number
-    --]]
-    local count = 0 -- auto-incrementing handle
-    function M.setbreakpoint(func, line)
-      if type(func) ~= "function" then
-        error("bad argument 1 to setbreakpoint: expected function", 2)
-      end
-      if type(line) ~= "number" then
-        error("bad argument 2 to setbreakpoint: expected number", 2)
-      end
-      count = count + 1
-
-      local bp = breakpoints[func] or {}
-      bp[count] = line
-      bp.n = (bp.n or 0) + 1
-      breakpoints[func] = bp
-
-      return count
-    end
-
-    --[[
-      Remove a breakpoint
-      handle: string
-    --]]
-    function M.removebreakpoint(handle)
-      for _, bps in pairs(breakpoints) do
-        if bps[handle] then
-          bps[handle] = nil
-          bps.n = bps.n - 1
-        end
-      end
-    end
-
-    local callhook
-
-    local function linehook()
-      local info = debug.getinfo(2, "fl")
-
-      local bps = breakpoints[info.func]
-      if bps and bps.n > 0 then
-        for handle, line in pairs(bps) do
-          if info.currentline == line then
-            print(string.format("breakpoint found: %d", handle))
-            debug.debug()
-          end
-        end
-      else
-        debug.sethook(callhook, "cr")
-      end
-    end
-
-    function callhook()
-      local func = debug.getinfo(2, "f").func
-
-      local bps = breakpoints[func]
-      if bps and bps.n > 0 then
-        debug.sethook(linehook, "l")
-      end
-    end
-
+  else
     debug.sethook(callhook, "cr")
+  end
+end
 
-    return M
-    ```
+function callhook()
+  local func = debug.getinfo(2, "f").func
+
+  local bps = breakpoints[func]
+  if bps and bps.n > 0 then
+    debug.sethook(linehook, "l")
+  end
+end
+
+debug.sethook(callhook, "cr")
+
+return M
+```
