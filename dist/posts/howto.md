@@ -22,7 +22,7 @@ I want to bring up CSS Grid first because I essentially designed this site aroun
 
 &nbsp;
 
-In a parent element set the the display style to `grid` and create the template. 
+In a parent element set the display style to `grid` and create the template. 
 
 ```css
 main {

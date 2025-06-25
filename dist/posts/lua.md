@@ -13,6 +13,8 @@ In this article, I discuss language features of Lua as they relate to some gener
 \
 The primary sources for this article are the book Programming in Lua 4th edition (which concerns Lua 5.3.2), the Lua mailing list archive, the Lua 5.4 manual, and tested in Lua 5.4.7. As such, I will talk about features guaranteed compatible with Lua 5.4.7. More than likely, most of what is written here will also be 5.3, 5.2, and LuaJIT compatible, but I will be using the PUC compiler. If I don't associate a version with a statement it is safe to assume Lua 5.4.7. And any code examples given with `>` preceding will be using the REPL environment. My solutions to most of the Programming in Lua book exercises and some code examples from the book can be found in this [github repo](https://github.com/edibblepdx/pil-4th). But please, buy the book if you would like to learn more.
 
+<img src="https://i.ibb.co/hJLNn2Yy/Lua-Sprite.png" alt="Lua-Sprite" border="0"/>
+
 &nbsp;
 # Why Lua?
 
@@ -1210,11 +1212,25 @@ In the **finaliztion phase**, Lua calls the finalizers of all objects that were 
 Lua also has *emergency collection* which will force a full garbage collection cycle when memory allocation fails and try again. There is also a function called `collectgarbage` that allows some control over the garbage collector. Such as stopping or forcing a collection cycle or setting how often to run a cycle.
 
 &nbsp;
-## Weak tables, ephemeron tables,  and finalizers
+## Weak tables, ephemeron tables, and finalizers
 
-The garbage collector cannot guess what we deem to be garbage. Leftover variables such as in a generic stack program maintain references such that objects are not seen as garbage by Lua. Similarly, any object stored in a global variable is not garbage to Lua. It is up to the programmer to assign nil to these locations so that they can be collected at the end of their lifetime. But what if we want to keep a list of live objects without preventing them from beign collect?
+The garbage collector cannot guess what we deem to be garbage. Leftover variables such as in a generic stack program maintain references such that objects are not seen as garbage by Lua. Similarly, any object stored in a global variable is not garbage to Lua. It is up to the programmer to assign nil to these locations so that they can be collected at the end of their lifetime. But what if we want to keep a list of live objects without preventing them from being collected?
+\
+\
+**Weak tables** can hold weak references to objects without preventing them from being collected. Weak tables can have weak keys, weak values, or both.
 
-Lua provides weak tables
+```lua
+setmetatable({}, { __mode = "kv" })
+```
+
+A typical problem occurs when, in a table with weak keys, a value refers to its own key. From the standard interpretation of weak tables, that entry would never be collected from the table. **Ephemeron tables** solve this problem. Since Lua 5.2, the reference to a value is only strong if there is some other external reference to the key. Otherwise the garbage collector will eventually collect the key and remove the entry from the table.
+\
+\
+**Finalizers** are functions that are installed in an object to be called when that object is collected. They can be useful for extra cleanup or logging.
+
+```lua
+setmetatable({}, { __gc = function(o) print("I am being collected") end })
+```
 
 &nbsp;
 # Polymorphism
