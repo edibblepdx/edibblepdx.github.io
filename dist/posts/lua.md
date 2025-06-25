@@ -256,331 +256,320 @@ Strings cannot be indexed. To get a substring use `string.sub`.
 > string.sub(s, -1, -1) --> ]
 ```
 
-- What operators are allowed in expressions? What are any interesting features
-of the precedence and associativity rules for operators (e.g., differences from other languages like C++ or Python)?
+&nbsp;
+# Operators
+
+Lua has the following operators, ordered by precedence in the table below from higher to the lower priority:
+
+```lua
+^
+unary operators (- # ~ not)
+*    /    //    %
++    -
+..         (concatenation)
+<<   >>    (bitwise shifts)
+&          (bitwise AND)
+~          (bitwise exclusive OR)
+|          (bitwise OR)
+<    >    <=    >=    ~=    ==
+and
+or
+```
+
+Concatenation `..` and exponentiation `^` are right associative. All other binary operators are left associative.
+
+&nbsp;
+# Variable Bindings and Scope
 
-    Operator precedence in Lua follows the table below, from higher to the lower priority:
+There are three kinda of variables in Lua: global variables, local variables, and table fields. All variable bindings are global unless you tag them as `local`. Unlike global variables, a local variable has it's scope limited to the block where it is declared. A block can be the body of a control structure, a function, or a chunk (the file).
+\
+\
+You cannot use variable bindings in expressions like with `let` bindings in languages like Haskell. The following is invalid syntax.
 
-    ```lua
-    ^
-    unary operators (- # ~ not)
-    *    /    //    %
-    +    -
-    ..         (concatenation)
-    <<   >>    (bitwise shifts)
-    &          (bitwise AND)
-    ~          (bitwise exclusive OR)
-    |          (bitwise OR)
-    <    >    <=    >=    ~=    ==
-    and
-    or
-    ```
+```lua
+print(local a = 5; a) --> has no meaning
+```
+
+Every Lua program is compiled in the scope of an external local variable `_ENV` (so that `_ENV` itself is never a free name in a chunk). Every reference to a free name `var` is syntactically translated to `_ENV.var`. `_ENV` is a completely regular and local name. As such, you can define new variables and parameters with that name. Each reference to a free name will use the `_ENV` table that is visible at that point in the program. Any table with the name `_ENV` is known as the *environment*.
+\
+\
+Lua keeps a *global environment* at a special index in the C-registry. The global table `_G` is initialized to this value and so is `_ENV`. However, Lua never uses `_G` internally. Therefore, by default, free names in Lua code refer to entries in the global environment and are *global variables*.
+\
+\
+Lua is **lexically scoped**. The scope of a local variable begins after the declaration and goes until the last non-void statement at end of the innermost block containing the declaration. Because of lexical scoping rules, local variables can be freely accessed by functions defined in their scope.
+
+&nbsp;
+# Functions
 
-    Concatenation `..` and exponentiation `^` are right associative. All other binary operators are left associative.
+Functions in Lua are first class values. A program can store functions in variables (both global and local) and in tables, pass functions as arguments to other functions, and return functions as results. Functions also have proper lexical scoping meaning that they can access variables of their enclosing scope within a closure (and that Lua properly contains the lambda calculus).
+\
+\
+Functions in Lua are defined in `function` .. `end` blocks as shown in the following example. In fact, function declaration is syntactic sugar for assigning a variable a value of type function.
 
-- Is there an equivalent to `let`-bindings in expressions?
+```lua
+function a() end
+a = function() end -- is equivalent
 
-    Standard variable bindings in Lua are similar to let bindings in that they bind a name to a value within the current lexical scope, but they are not useable in expressions. The following is invalid syntax.
+local function b() end
+local b = function() end -- is equivalent
+```
 
-    ```lua
-    print(local a = 5; a) --> has no meaning
-    ```
+&nbsp;
+## Arguments
 
-    Every Lua program is compiled in the scope of an external local variable `_ENV`. Every reference to a free name `var` is syntactically translated to `_ENV.var`. `_ENV` is a completely regular name, and as such, you can define new variables and parameters with that name. Each reference to a free name will use the `_ENV` table that is visible at that point in the program. Any table with the name `_ENV` is known as the <em>environment</em>.
+All arguments in Lua are passed by value. But functions, tables, userdata, and threads are objects and variables do not contain these values, only references to them. Assignment, parameter passing, and function returns manipulate references to these values and do not imply a copy of the object itself. Lua will also attempt to eagerly evaluate arguments. Note that the default value of a variable is `nil`. And the default value of a missing table entry is `nil`—the environment itself is a table.
 
-    Lua also keeps a <em>global environment</em> at a special index in the C-registry. The global table `_G` is initialized to this value and so is `_ENV`. However, Lua never uses `_G` internally.
+```lua
+function a(x) return 42 end
 
-# Functions, binding, scoping
+a(b)     --> 42
+a(b + c) --> attempt to perform arithmetic on a nil value (global 'b')
 
-- What is the syntax for function definitions? What about mutually recursive
-function definitions?
+function a(t) t.x = 42 end
+t = {}; a(t)
+print(t.x) --> 42
+```
 
-    Functions in Lua are defined in `function` .. `end` blocks as shown in the following example. In fact, the first form is just syntactic sugar for the second.
+Lua supports proper tail calls. If the last thing a function does is call another function (or itself), it takes no additional stack space; i.e. a stack overflow error is impossible.
 
-    ```lua
-    function a() end
-    a = function() end
+```lua
+function f()
+  return g()
+end
+```
 
-    local function b() end
-    local b = function() end
-    ```
+&nbsp;
+## Recursion
 
-    Lua supports proper tail calls. If the last thing a function does is call another function (or itself), it takes no additional stack space; i.e. a stack overflow error is impossible.
+But this next example can overflow can overflow because the function `f` still has to discard the return value of `g`.
+
+```lua
+function f()
+  g()
+  return -- this return is implicit
+end
+```
+
+Lua also supports mutually recursive functions. And this will never overflow making it useful for state machines.
+
+```lua
+local a, b -- forward declaration only required if a and b are local
+
+a = function()
+  return b()
+end
 
-    ```lua
-    function f()
-      return g()
-    end
-    ```
+b = function()
+  return a()
+end
 
-    But this next example can overflow can overflow because the function `f` still has to discard the return value of `g`.
+a()
+```
 
-    ```lua
-    function f()
-      g()
-      return -- this return is implicit
-    end
-    ```
+&nbsp;
+## Nesting
 
-    Lua also supports mutually recursive functions. And this will never overflow making it useful for state machines.
+Functions in Lua can be nested using the same syntax as before.
 
-    ```lua
-    local a, b -- forward declaration only required if a and b are local
-
-    a = function()
-    return b()
-    end
-
-    b = function()
-    return a()
-    end
-
-    a()
-    ```
-
-- Can function definitions be nested (i.e. can we define a local function within
-the body of another function)? If so, what is the syntax for this?
-
-    Functions in Lua can be nested using the same syntax as before.
-
-    ```lua
-    function outer()
-      function inner()
-        print("hello inner")
-      end
-
-      inner()
-    end
-
-    print(outer()) --> "hello inner"
-    ```
-
-- Are there any unusual features to the binding and scoping rules (e.g. like
-Python's `global` and `nonlocal` declarations)?
-
-    All variable bindings are global unless you tag them as `local`. Unlike global variables a local variable has it's scope limited to the block where it is declared. A block can be the body of a control structure, a function, or a chunk (the file).
-
-    ```lua
-    local function setGlobal(v)
-      a = v
-    end
-
-    setGlobal(42)
-    print(a) --> 42
-    
-    local function setLocal(v)
-      local b = v
-    end
-
-    setLocal(42)
-    print(b) --> nil
-    ```
-
-    Additionally, take the previous example with the functions `outer` and `inner`. Since `inner` was declared global, once `outer` gets called `inner` is put into the global environment.
-
-    ```lua
-    -- snip --
-    print(outer()) --> "hello inner"
-    print(inner()) --> "hello inner"
-    ```
-
-    Lua functions also have <em>lexical scoping</em> meaning that they have access to non-local variables within a closure. See the section on lambda functions for more information.
-
-- Can functions be passed as arguments to other functions (e.g. passing a
-comparison operator to a general-purpose `sort` function)?
-
-    Functions in Lua are first class values. A program can store functions in variables (both global and local) and in tables, pass functions as arguments to other functions, and return functions as results. Functions also have proper lexical scoping meaning that they can access variables of their enclosing scope (and that Lua properly contains the lambda calculus).
-
-    Here is an example of an iterator over subsets that takes a table and a function as arguments.
-
-    ```lua
-    -- write a 'true iterator' that traverses
-    -- all subsets of a given set
-
-    -- 2^n subsets including the empty set
-    -- can use a binary representation
-    --> either it is in the subset or it is not
-    --> iterate from 0 to n_subsets - 1
-    --> each binary digit is in or out
-
-    function allsubsets (t, f)
-      local n = #t
-      local n_subsets = 2^n
-      local subset = {}
-      for i = 0, n_subsets - 1 do
-        for j = 1, n do
-          local include = i >> (n - j) & 1
-          if include == 1 then
-            subset[#subset + 1] = t[j]
-          end
-        end
-        f(subset)
-        subset = {}
-      end
-    end
-
-    local a = {}
-    -- just going to collect the subsets 
-    allsubsets({1, 2, 3, 4, 5}, function (t) a[#a + 1] = t end)
-    for k, v in ipairs(a) do 
-      io.write("{")
-      for j, k in ipairs(v) do 
-        io.write(string.format("%d,",k))
-      end 
-      io.write("}\n")
-    end
-    print(string.format("subsets: %d", #a))
-    ```
-
-- Can functions be stored in data structures (e.g. when serving as a call-back)?
-
-    The only data structure in lua is the table and they are essentially associative arrays. Tables can hold functions like any other value. Since functions are first-class values in Lua, they can be assigned as elements in tables, used as callbacks, and stored as instance methods. In the following example, both `proxy` and `mt` are tables.
-
-    ```lua
-    -- write a function fileAsArray that returns a proxy to a file
-    -- after t = fileAsArray("filename")
-    -- t[i] returns the i-th byte in the file
-    -- an assignment to t[i] updates the i-th byte in the file
-
-    function fileAsArray (filename)
-      local file = assert(io.open(filename, "r+"))
-      local proxy = {
-        close = function ()
-          if file then file:close() end
-        end
-      }
-
-      mt = {
-        __index = function (_, k)
-          file:seek("set", k - 1)
-          return file:read(1)
-        end,
-
-        __newindex = function (_, k, v)
-          file:seek("set", k - 1)
-          file:write(string.char(v))
-        end,
-
-        __pairs = function ()
-          file:seek("set")
-          local k = 0
-          return function ()
-            k, v = k+1, file:read(1) or nil
-            return v and k, v
-          end
-        end,
-
-        __len = function ()
-          return file:seek("end")
-        end
-      }
-
-      setmetatable(proxy, mt)
-      return proxy
-    end
-
-    t = fileAsArray("20-4-file")
-
-    t[1] = 67
-    t[2] = 65
-    t[3] = 84
-
-    print()
-    print(t[1]) --> C
-    print(t[2]) --> A
-    print(t[3]) --> T
-
-    print()
-    print(#t)
-
-    print()
-    for k, v in pairs(t) do print(k, v) end
-
-    t.close()
-    ```
-
-- Is there support for anonymous functions (a.k.a. lambda expressions)? If so,
-what is the syntax for them? Are there restrictions on the form of anonymous
-function bodies?
-
-    Lua properly contains the lambda calculus. In fact, function declarations are syntactic sugar and the syntax in unchanged. Functions are also first-class values. Functions have *lexical scoping*; they have access to *non-local variables* or *upvalues* from their surrounding scope within a closure.
-
-    ```lua
-    function a() end
-    a = function() end -- is equivalent
-
-    local function b() end
-    local b = function() end -- is equivalent
-    ```
-
-    You can pass an anonymous function as an argument to another function.
-
-    ```lua
-    function on10(f) return f(10) end
-
-    print(on10(function(x) return x + 32 end)) --> 42
-    ```
-
-    Functions can return other functions as a generator.
-
-    ```lua
-    function newCounter()
-      local count = 0
-      return function()
-        count = count + 1
-        return count
+```lua
+function outer()
+  function inner()
+    print("hello inner")
+  end
+
+  inner()
+end
+
+print(outer()) --> "hello inner"
+```
+
+Additionally, since `inner` was declared global, once `outer` gets called `inner` is put into the global environment.
+
+```lua
+-- snip --
+print(outer()) --> "hello inner"
+print(inner()) --> "hello inner"
+```
+
+More abstractly, since are variable declarations are by default global, functions can declare global variables.
+
+```lua
+local function setGlobal(v)
+  a = v
+end
+
+setGlobal(42)
+print(a) --> 42
+
+local function setLocal(v)
+  local b = v
+end
+
+setLocal(42)
+print(b) --> nil
+```
+
+&nbsp;
+## First-Class Values
+
+Functions are first class values in Lua and there are no restrictions on having functions as arguments, as return values, or in regular assignment. They can be named or anonymous and closed over variables. And they will be collected by the garbage collector at the end of their lifetime.
+\
+\
+You can pass a function as an argument to another function.
+
+```lua
+function on10(f) return f(10) end
+
+print(on10(function(x) return x + 32 end)) --> 42
+```
+
+Here is an example of an iterator over subsets that takes a table and a function as arguments.
+
+```lua
+-- write a 'true iterator' that traverses
+-- all subsets of a given set
+
+-- 2^n subsets including the empty set
+-- can use a binary representation
+--> either it is in the subset or it is not
+--> iterate from 0 to n_subsets - 1
+--> each binary digit is in or out
+
+function allsubsets (t, f)
+  local n = #t
+  local n_subsets = 2^n
+  local subset = {}
+  for i = 0, n_subsets - 1 do
+    for j = 1, n do
+      local include = i >> (n - j) & 1
+      if include == 1 then
+        subset[#subset + 1] = t[j]
       end
     end
+    f(subset)
+    subset = {}
+  end
+end
 
-    c1 = newCounter()
-    print(c1()) --> 1
-    print(c1()) --> 2
+local a = {}
+-- just going to collect the subsets 
+allsubsets({1, 2, 3, 4, 5}, function (t) a[#a + 1] = t end)
+for k, v in ipairs(a) do 
+  io.write("{")
+  for j, k in ipairs(v) do 
+    io.write(string.format("%d,",k))
+  end 
+  io.write("}\n")
+end
+print(string.format("subsets: %d", #a))
+```
 
-    c2 = newCounter()
-    print(c2()) --> 1
-    ```
+Functions can return other functions as a generator.
 
-- How are arguments passed to functions (e.g., by value, by name, something
-else; you might want to recall Week 2a lecture notes)?
+```lua
+function newCounter()
+  local count = 0
+  return function()
+    count = count + 1
+    return count
+  end
+end
 
-    All arguments in Lua are passed by value. But functions, tables, userdata, and threads are objects and variables do not contain these values, only references to them. Assignment, parameter passing, and function returns manipulate references to these values and do not imply a copy of the object itself. Lua will also attempt to eagerly evaluate arguments. Note that the default value of a variable is `nil`. And the default value of a missing table entry is `nil`—the environment itself is a table.
+c1 = newCounter()
+print(c1()) --> 1
+print(c1()) --> 2
 
-    ```lua
-    function a(x) return 42 end
+c2 = newCounter()
+print(c2()) --> 1
+```
 
-    a(b)     --> 42
-    a(b + c) --> attempt to perform arithmetic on a nil value (global 'b')
+&nbsp;
+## Storing Functions
 
-    function a(t) t.x = 42 end
-    t = {}; a(t)
-    print(t.x) --> 42
-    ```
+Since functions are first-class values in Lua, they can be assigned as elements in tables, used as callbacks, and stored as instance methods. In the following example, both `proxy` and `mt` are tables.
 
-# Statements and Control
+```lua
+-- write a function fileAsArray that returns a proxy to a file
+-- after t = fileAsArray("filename")
+-- t[i] returns the i-th byte in the file
+-- an assignment to t[i] updates the i-th byte in the file
 
-- What primitive or atomic statements (i.e. statements that do not have
-sub-statements) does the language provide? Can expressions be used as atomic
-statements?
+function fileAsArray (filename)
+  local file = assert(io.open(filename, "r+"))
+  local proxy = {
+    close = function ()
+      if file then file:close() end
+    end
+  }
 
-    The smallest atomic statements in Lua are:
+  mt = {
+    __index = function (_, k)
+      file:seek("set", k - 1)
+      return file:read(1)
+    end,
 
-    ```
-    atom_stat ::=  ‘;’ |
-        varlist ‘=’ explist |
-        functioncall |
-        label |
-        break |
-        goto Name |
-        local attnamelist [‘=’ explist]
-    ```
+    __newindex = function (_, k, v)
+      file:seek("set", k - 1)
+      file:write(string.char(v))
+    end,
 
-    Expressions cannot be used as atomic statements in Lua. You will get an "unexpected symbol" or "attempt to call a nil value" error if you try to use an expression as a statement.
+    __pairs = function ()
+      file:seek("set")
+      local k = 0
+      return function ()
+        k, v = k+1, file:read(1) or nil
+        return v and k, v
+      end
+    end,
 
-- Can assignment be performed as a side-effect of evaluating an expression, or
-only by a statement? (For example, in C++, `(x = 1) + 2` assigns to `x` in the
-middle of an expression.)
+    __len = function ()
+      return file:seek("end")
+    end
+  }
 
-    Assignment cannot be performed as a side-effect of evaluating an expression in Lua, only a statement.
+  setmetatable(proxy, mt)
+  return proxy
+end
+
+t = fileAsArray("20-4-file")
+
+t[1] = 67
+t[2] = 65
+t[3] = 84
+
+print()
+print(t[1]) --> C
+print(t[2]) --> A
+print(t[3]) --> T
+
+print()
+print(#t)
+
+print()
+for k, v in pairs(t) do print(k, v) end
+
+t.close()
+```
+
+&nbsp;
+# Atomic Statements
+
+The smallest atomic statements (i.e. statements that do not have
+sub-statements) in Lua are the following,
+
+```
+atom_stat ::=  ‘;’ |
+    varlist ‘=’ explist |
+    functioncall |
+    label |
+    break |
+    goto Name |
+    local attnamelist [‘=’ explist]
+```
+
+Expressions cannot be used as atomic statements in Lua. You will get an "unexpected symbol" or "attempt to call a nil value" error if you try to use an expression as a statement. Neither can Assignment be performed as a side-effect of evaluating an expression in Lua.
+
+<!-- might want to make a section on side ffects or find a better place for the second part -->
 
 &nbsp;
 # Structured Control Statements
@@ -588,7 +577,7 @@ middle of an expression.)
 &nbsp;
 ## Sequencing
 
-The unit of execution in Lua is called a chunk. A chunk is defined as a sequence of statements, where each statement may optionally be followed by a semicolon: `chunk := {stmt [;]}`. A block is a list of statements and is syntactically equivalent to a chunk. A block may be explicitly delimited to produce a single statement: `stmt := do block end`. A chunk may be stored in a file or a string inside the host program. Lua compiles a chunk as an anonymous function with the global environment set as the first upvalue; each Lua program is a function.
+The unit of execution in Lua is called a chunk. A chunk is defined as a sequence of statements, where each statement may optionally be followed by a semicolon: `chunk := {stmt [;]}`. A block is a list of statements and is syntactically equivalent to a chunk. A block may be explicitly delimited to produce a single statement: `stmt := do block end`. A chunk may be stored in a file or a string inside the host program. Lua compiles a chunk as an anonymous function with the global environment set as the first upvalue in the name local name `_ENV`; each Lua program is a function.
 
 &nbsp;
 ## Selection
@@ -1039,44 +1028,6 @@ local a = a or b
 
 Checks for the existence of a global 'a' and assigns the local 'a' that value if it exists or 'b'. This may be used to bring a global value into local scope which provides faster access to said value simply as a result of Lua's implementation. In general, variable accesses are expanded to `_ENV.name` and since `_ENV` is a table (that you may modify or replace as you please) accessing an absent field returns `nil`. So that if you don't care for a default value you can simply perform direct assignment and the local 'a' will receive that value or `nil`.
 
-- What would be the most idiomatic way to define an AST tree type (like the one
-we have used in our interpreters) in this language?
-
-    Possibly the most idiomatic way to handle an AST tree type in Lua is tagged tables. And some form of dynamic dispatch, be it if statements or anonymous tables.
-
-    ```lua
-    function Literal(v)
-      return { _tag = "literal", v = v }
-    end
-
-    function BinaryOp(token, e1, e2)
-      return { _tag = "binop", _token = token, e1, e2 }
-    end
-
-    function UnaryOp(token, e)
-      return { _tag = "unop", _token = token, e }
-    end
-
-    function Eval(e)
-      if e._tag == "literal" then
-        return e.v
-      elseif e._tag == "binop" then
-        return ({
-          ["+"] = function(a, b) return Eval(a) + Eval(b) end,
-          ["-"] = function(a, b) return Eval(a) - Eval(b) end,
-          ["*"] = function(a, b) return Eval(a) * Eval(b) end,
-          ["/"] = function(a, b) return Eval(a) / Eval(b) end,
-        })[e._token](e[1], e[2])
-      elseif e._tag == "unop" then
-        return ({
-          ["-"] = function(a) return -Eval(a) end,
-        })[e._token](e[1])
-      end
-    end
-
-    print(Eval(BinaryOp("+", Literal(1), Literal(2)))) --> 3
-    ```
-
 &nbsp;
 # Array and Dictionary Types
 
@@ -1201,6 +1152,44 @@ assert(trout == salmon) --> assertion failed!
 ```
 
 &nbsp;
+# Aside: Defining an AST Type
+
+Lua is commonly used to create domain specific languages. While Lua does not use an abstract syntax tree in its own implementation they are common and [Metalua](http://lua-users.org/wiki/MetaLua) provides an alternative compiler that does define an AST. Possibly the most idiomatic way to handle an AST tree type in Lua is tagged tables. And some form of dynamic dispatch, be it if statements or anonymous tables.
+
+```lua
+function Literal(v)
+  return { _tag = "literal", v = v }
+end
+
+function BinaryOp(token, e1, e2)
+  return { _tag = "binop", _token = token, e1, e2 }
+end
+
+function UnaryOp(token, e)
+  return { _tag = "unop", _token = token, e }
+end
+
+function Eval(e)
+  if e._tag == "literal" then
+    return e.v
+  elseif e._tag == "binop" then
+    return ({
+      ["+"] = function(a, b) return Eval(a) + Eval(b) end,
+      ["-"] = function(a, b) return Eval(a) - Eval(b) end,
+      ["*"] = function(a, b) return Eval(a) * Eval(b) end,
+      ["/"] = function(a, b) return Eval(a) / Eval(b) end,
+    })[e._token](e[1], e[2])
+  elseif e._tag == "unop" then
+    return ({
+      ["-"] = function(a) return -Eval(a) end,
+    })[e._token](e[1])
+  end
+end
+
+print(Eval(BinaryOp("+", Literal(1), Literal(2)))) --> 3
+```
+
+&nbsp;
 # Garbage collection
 
 Lua uses an incremental garbage collector that runs interleaved with the interpreter. A garbage collection cycle has four phases: *mark, cleaning, sweep* and *finalization*.
@@ -1221,75 +1210,62 @@ In the **finaliztion phase**, Lua calls the finalizers of all objects that were 
 Lua also has *emergency collection* which will force a full garbage collection cycle when memory allocation fails and try again. There is also a function called `collectgarbage` that allows some control over the garbage collector. Such as stopping or forcing a collection cycle or setting how often to run a cycle.
 
 &nbsp;
-# Weak tables, ephemeron tables, finalizers, and the function collectgarbage
+## Weak tables, ephemeron tables,  and finalizers
 
 The garbage collector cannot guess what we deem to be garbage. Leftover variables such as in a generic stack program maintain references such that objects are not seen as garbage by Lua. Similarly, any object stored in a global variable is not garbage to Lua. It is up to the programmer to assign nil to these locations so that they can be collected at the end of their lifetime. But what if we want to keep a list of live objects without preventing them from beign collect?
 
 Lua provides weak tables
 
-# Is it possible to have call-by-reference function parameters? If so, how are these specified?
+&nbsp;
+# Polymorphism
 
-All function parameters are call-by-value in Lua. Variables however only contain references to objects. Objects are functions, tables, userdata, and threads. There is no special syntax to support call-by-reference.
+Since Lua is dynamically typed, there are no generic types and Lua is implicitly polymorphic. Parametric polymorphism does not exist in Lua, but it does have ad-hoc polymorphism through duck typing. So we may call a function passing any value as long as it implements the required traits. There is no static checking for traits but we can implement runtime checking.
 
-- Can function values be returned by (other) functions? If so, are there any
-restrictions on this feature?
+```lua
+function requireTrait(o, trait)
+  assert(
+    type(o[trait]) == "function",
+    string.format("%s Missing required trait '%s'", o, trait)
+  )
+end
+```
 
-    Functions are first class values in Lua and there are no restrictions on having functions as return values. They can be named or anonymous and closed over variables. And they will be collected by the garbage collector at the end of their lifetime.
+Metamethods are another form of ad-hoc polymorphism in Lua that allow overloading of operators and behaviors.
+
+```lua
+local v = setmetatable({ x = 1, y = 2 }, {
+  __add = function(a, b)
+    return { x = a.x + b.x, y = a.y + b.y }
+  end
+})
+
+local w = setmetatable({ x = 3, y = 4 }, getmetatable(v))
+
+local sum = v + w
+print(sum.x, sum.y) --> 4   6
+```
 
 &nbsp;
-# Type systems
+# Type Inference
 
-- Does the language support polymorphic or generic types for functions and data
-structures? If so, how are these specified and used?
+Lua does not have static types so there is no type inference. All variables and function parameters are untyped. Lua does not require or infer types during variable declaration, function definition, or application.
 
-    Since Lua is dynamically typed, there are no generic types and Lua is implicitly polymorphic. Parametric polymorphism does not exist in Lua, but it does have ad-hoc polymorphism through duck typing. So we may call a function passing any value as long as it implements the required traits. There is no static checking for traits but we can implement runtime checking.
+However, we can inspect the type of a value at runtime with the `type` function to perform some action or call a specified function dynamically.
 
-    ```lua
-    function requireTrait(o, trait)
-      assert(
-        type(o[trait]) == "function",
-        string.format("%s Missing required trait '%s'", o, trait)
-      )
-    end
-    ```
+```lua
+print(({
+  ["nil"]      = function() print("nil") end,
+  ["boolean"]  = function() print("boolean") end,
+  ["number"]   = function() print("number") end,
+  ["string"]   = function() print("string") end,
+  ["userdata"] = function() print("userdata") end,
+  ["function"] = function() print("function") end,
+  ["thread"]   = function() print("thread") end,
+  ["table"]    = function() print("table") end,
+})[type(5)]()) --> number
+```
 
-    Metamethods are another form of ad-hoc polymorphism in Lua that allow overloading of operators and behaviors.
-
-    ```lua
-    local v = setmetatable({ x = 1, y = 2 }, {
-      __add = function(a, b)
-        return { x = a.x + b.x, y = a.y + b.y }
-      end
-    })
-
-    local w = setmetatable({ x = 3, y = 4 }, getmetatable(v))
-
-    local sum = v + w
-    print(sum.x, sum.y) --> 4   6
-    ```
-
-- Is there any type inference (e.g., `auto` in C++)? If so, in what contexts
-(function definitions, local variables, function applications, etc.) does it
-work?
-
-    Lua does not have static types so there is no type inference. All variables and function parameters are untyped. Lua does not require or infer types during variable declaration, function definition, or application.
-
-    However, we can inspect the type of a value at runtime with the `type` function to perform some action or call a specified function dynamically.
-
-    ```lua
-    print(({
-      ["nil"]      = function() print("nil") end,
-      ["boolean"]  = function() print("boolean") end,
-      ["number"]   = function() print("number") end,
-      ["string"]   = function() print("string") end,
-      ["userdata"] = function() print("userdata") end,
-      ["function"] = function() print("function") end,
-      ["thread"]   = function() print("thread") end,
-      ["table"]    = function() print("table") end,
-    })[type(5)]()) --> number
-    ```
-
-    There is also a typed fork of Lua called Teal.
+There is also a statically typed dialect of Lua called [Teal](https://teal-language.org/).
 
 &nbsp;
 # Static Analysis
