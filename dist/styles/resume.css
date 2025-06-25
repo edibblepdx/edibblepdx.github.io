@@ -1,19 +1,19 @@
 main {
     display: grid;
-    grid-template-columns: 
-        minmax(2rem, 1fr) 
-        minmax(0, 40rem) 
+    grid-template-columns:
+        minmax(2rem, 1fr)
+        minmax(0, 40rem)
         minmax(2rem, 1fr);
 }
 /* squish edge padding on narrower screens */
 @media only screen and (max-width: 40rem) {
     main {
         grid-template-columns:
-            minmax(1rem, 1fr) 
-            minmax(0, 40rem) 
+            minmax(1rem, 1fr)
+            minmax(0, 40rem)
             minmax(1rem, 1fr);
     }
-} 
+}
 main > div {
     grid-column: 2;
     align-self: stretch;
@@ -24,4 +24,21 @@ main a {
 .download {
     display: inline-block;
     vertical-align: middle;
+}
+.grid {
+    display: grid;
+    grid-template-columns:
+        repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1.5rem;
+}
+.pocket {
+    background-color: white;
+    border-radius: 12px;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    box-shadow: 0px 5px 2px red;
+    padding: 1rem;
+}
+.pocket:hover {
+    transform: translateY(-5px);
 }
