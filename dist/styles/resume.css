@@ -13,6 +13,8 @@ main {
             minmax(0, 40rem)
             minmax(1rem, 1fr);
     }
+    /* hide image */
+    img {display: none;}
 }
 main > div {
     grid-column: 2;
@@ -25,20 +27,49 @@ main a {
     display: inline-block;
     vertical-align: middle;
 }
-.grid {
-    display: grid;
-    grid-template-columns:
-        repeat(auto-fill, minmax(15rem, 1fr));
-    gap: 1.5rem;
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.container a {
+    text-decoration: none;
 }
 .pocket {
-    background-color: white;
-    border-radius: 12px;
-    overflow: hidden;
-    aspect-ratio: 1 / 1;
-    box-shadow: 0px 5px 2px red;
+    /* self */
+    flex: 0 0 auto;
+    height: 10rem;
     padding: 1rem;
+    /* children */
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    /* embellishments */
+    background-color: var(--soft-black);
+    border-radius: 16px;
+    transition: background-color 100ms ease-in-out;
 }
 .pocket:hover {
-    transform: translateY(-5px);
+    /* lighten */
+    background-color: var(--soft-gray);
+}
+.pocket div {
+    flex: 1 1 0;
+    padding-right: 1rem;
+    /* This makes the text wrap. I do not know why. */
+    overflow: hidden;
+}
+.pocket img {
+    border-radius: 12px;
+    margin-right: 1rem;
+    height: 8rem;
+    width: 8rem;
+}
+.pocket h1 {
+    font-weight: bold;
+    /* default font for non-headers is 20px */
+    font-size: 30px;
+}
+.pocket p {
+    color: gray;
 }

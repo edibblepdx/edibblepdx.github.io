@@ -1,5 +1,5 @@
 ---
-title: How I Created a Free Static Website Using GitHub Pages.
+title: How I Created a Free Static Website Using GitHub Pages
 date: Jan 16, 2025
 edited: Jan 16,2025
 summary: >
