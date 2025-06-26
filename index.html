@@ -1,0 +1,62 @@
+<!-- Home Page -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>dibble</title>
+
+        <!-- font -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap" rel="stylesheet">
+
+        <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
+        <link rel="stylesheet" href="styles/palette.css">
+        <link rel="stylesheet" href="styles/reset.css">
+        <link rel="stylesheet" href="styles/navbar.css">
+        <link rel="stylesheet" href="styles/index.css">
+    </head>
+    <body class="content">
+        <!-- Navbar -->
+        <div id="navbar">
+            <img src="resources/terminal-solid.svg" class="search">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="portfolio.html">Portfolio</a></li>
+            </ul>
+            <a href="https://github.com/edibblepdx" class="github-mark">
+                <img src="resources/github-mark.svg">
+            </a>
+        </div> 
+<!-- Main Content -->
+        <main>
+            <div>
+                <h1 style="color: var(--color2)">Hello, I'm Ethan.</h1>
+                <br/>
+                <p>
+                    I am a student studying computer science and mathematics.
+                </p>
+                <br/>
+                <p>
+                    I'm particularly interested in linear algebra, calculus,
+                    and analysis, and I enjoy computer graphics as a way to express
+                    those skills. Recently, I have been working on a few computer 
+                    graphics projects, some shader art coding, and learning new
+                    programming languages in my free time.
+                </p>
+                <br/><br/>
+<!-- Posts -->
+                <ul id="list"></ul>
+                <template id="listItem">
+                    <li><a href="post.html?title=">
+                        <h2 id="post-title"></h2><br/>
+                        <p id="post-summary"></p><br/>
+                        <p id="post-date"></p>
+                    </a></li>
+                </template>
+            </div>
+            <div class="pad-scroll"></div>
+        </main>
+    </body>
+    <script type="module" src="scripts/list.js"></script>
+</html>
