@@ -49,6 +49,13 @@ html, body {
     font-family: 'Roboto', sans-serif;
 }
 
+/* text scaling for phones */
+@media only screen and (max-width: 40rem) {
+    html, body {
+        font-size: 18px;
+    }
+}
+
 /* TESTING */
 /* * {
     border: 1px solid red;
