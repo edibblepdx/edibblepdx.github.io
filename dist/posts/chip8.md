@@ -113,7 +113,7 @@ Wgpu is based on the WebGPU standard, but it can run both natively and in the br
 
 # What next?
 
-Simplest to most advanced would possible be: a colorway parameter, bit display, TUI menu, and debugger. For now this project will remain dormant while I focus on other things, but this is what I would focus on were I to come back and make some revisions or enhancements.
+Simplest to most advanced would possibly be: a colorway parameter, bit display, TUI menu, and debugger. For now this project will remain dormant while I focus on other things, but this is what I would focus on were I to come back and make some revisions or enhancements.
 
 &nbsp;
 
