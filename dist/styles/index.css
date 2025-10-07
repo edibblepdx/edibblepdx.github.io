@@ -39,7 +39,6 @@ a {
 #list li > a {
     display: block;
     color: var(--soft-white);
-    text-decoration: none;
 }
 /*
 #list li::after {
@@ -76,8 +75,9 @@ a {
     /* lighten */
     background-color: var(--soft-gray);
 }
-.pocket h1 {
+.pocket h2 {
     font-weight: bold;
+    text-decoration: underline;
     /* default font for non-headers is 20px */
     font-size: 30px;
 }
