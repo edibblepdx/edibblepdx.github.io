@@ -14,7 +14,7 @@ main {
             minmax(1rem, 1fr);
     }
     /* hide image */
-    img {display: none;}
+    .pocket img {display: none;}
 }
 main > div {
     grid-column: 2;
