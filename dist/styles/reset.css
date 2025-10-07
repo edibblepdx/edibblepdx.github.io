@@ -49,6 +49,13 @@ html, body {
     font-family: 'Roboto', sans-serif;
 }
 
+/* increase font size on smaller screens */
+@media only screen and (max-width: 40rem) {
+    html, body {
+        font-size: 25px;
+    }
+}
+
 /* TESTING */
 /* * {
     border: 1px solid red;
