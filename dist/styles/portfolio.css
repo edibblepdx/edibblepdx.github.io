@@ -67,6 +67,7 @@ main a {
 }
 .pocket h1 {
     font-weight: bold;
+    text-decoration: underline;
     /* default font for non-headers is 20px */
     font-size: 30px;
 }
