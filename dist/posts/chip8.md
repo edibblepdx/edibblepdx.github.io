@@ -43,7 +43,7 @@ Rust is also expression-oriented and relies heavily on pattern matching. Lazy it
 
 &nbsp;
 
-Large projects in Rust however can get very complex in ways different than C++ and certain patterns have a lot of boilerplate code. Lifetimes and generics can sometimes be confusing and closures also have an odd syntax. Some would-be-useful features of cargo workspaces like separate `config.toml` files are also still not released yet. Trait objects and async also require more work from the developer. And Rust also doesn't have reflection.
+Large projects in Rust, however, can get very complex in ways different from C++, and certain patterns have a lot of boilerplate code. Lifetimes and generics can sometimes be confusing, and closures also have an odd syntax. Some would-be-useful features of cargo workspaces, like separate `config.toml` files, are also still not released yet. Trait objects and async require more work from the developer. And Rust also doesn't have reflection.
 
 &nbsp;
 
