@@ -829,7 +829,7 @@ end
 print(string.format("subsets: %d", #a))
 ```
 
-Coroutines provide another method of iteration. A coroutine is a line of execution that suspends its execution only when it explicitly requests to be suspended. Coroutines redefine the relationship between caller and callee. Coroutines have their own stack, local variables, and own instruction pointer; they share global variables and pretty much anything else. The idea is to pair a generator with a factory that arranges the generator to run inside a coroutine and creates the iterator function.
+Coroutines provide another method of iteration. A coroutine is a line of execution that suspends its execution only when it explicitly requests to be suspended—they redefine the relationship between caller and callee. Coroutines have their own stack, local variables, and own instruction pointer; they share global variables and pretty much anything else. The idea is to pair a generator with a factory that arranges the generator to run inside a coroutine and creates the iterator function.
 
 ```lua
 -- 24.2 transform exercise 6.5 into a generator for combinations using coroutines
@@ -926,7 +926,8 @@ end
 # Errors
 
 Any unexpected condition that Lua encounters will raise an error. Errors can also be explicitly raised with the function `error` which takes an error message as its first argument. The second argument to `error` is the level, with 1 being the current scope and 2 being the caller. Lua also has an `assert` function that asserts its first argument is not false. The second argument to `assert` is an optional error message.
-
+\
+\
 To handle errors inside Lua code we use `pcall` or "protected call" and encapsulate the code in a function. If no errors are found it will return `true` and any other values returned by the encapsulated code. Otherwise, it returns `false` and the error message. `pcall` itself never raises an error.
 
 ```lua
@@ -1265,7 +1266,8 @@ print(sum.x, sum.y) --> 4   6
 # Type Inference
 
 Lua does not have static types so there is no type inference. All variables and function parameters are untyped. Lua does not require or infer types during variable declaration, function definition, or application.
-
+\
+\
 However, we can inspect the type of a value at runtime with the `type` function to perform some action or call a specified function dynamically.
 
 ```lua
@@ -1470,9 +1472,11 @@ f()
 ```
 
 Recall however, that a Lua chunk is compiled as an anonymous function. Typically module code will return a table but modules may instead decide to return other values or have side effects such as creating global variables.
-
+\
+\
 Loaded packages are in the `package.loaded` table. If we try to `require` the same package, `require` will just return the one we already have. We can force a reload of the package by removing it from `package.loaded` (set the value to `nil`) and allow it to be garbage collected.
-
+\
+\
 A module can return a package in multiple ways. Some common ones are
 
 ```lua

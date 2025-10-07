@@ -1,5 +1,5 @@
 ---
-title: 'Chip-8: A gentle introduction to Emulation'
+title: 'Oxid-8: A Gentle Introduction to Emulation'
 date: Oct 6, 2025
 edited: Oct 6,2025
 summary: >
