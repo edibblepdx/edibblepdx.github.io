@@ -13,10 +13,17 @@ main {
             minmax(0, 40rem) 
             minmax(1rem, 1fr);
     }
-} 
+}
 main > div {
     grid-column: 2;
     align-self: stretch;
+}
+a {
+    color: var(--soft-white);
+}
+.book-mark {
+    display: inline-flex;
+    gap: 0.25rem;
 }
 /* might interfere with navbar */
 #list {
