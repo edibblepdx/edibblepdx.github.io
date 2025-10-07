@@ -1,7 +1,7 @@
 ---
 title: A Language Analysis of Lua
 date: June 22, 2025
-edited: June 22, 2025
+edited: Oct 7, 2025
 summary: >
     An analysis of Lua as it relates to some general principles of programming languages.
 ---
