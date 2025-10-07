@@ -34,6 +34,7 @@ main > div {
     color: var(--soft-white);
     text-decoration: none;
 }
+/*
 #list li::after {
     content: '';
     display: block;
@@ -47,6 +48,36 @@ main > div {
 #list li:last-child::after {
     display: none;
 }
+*/
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.container a {
+    text-decoration: none;
+}
+.pocket {
+    /* self */
+    padding: 1rem;
+    /* embellishments */
+    background-color: var(--soft-black);
+    border-radius: 16px;
+    transition: background-color 100ms ease-in-out;
+}
+.pocket:hover {
+    /* lighten */
+    background-color: var(--soft-gray);
+}
+.pocket h1 {
+    font-weight: bold;
+    /* default font for non-headers is 20px */
+    font-size: 30px;
+}
+.pocket p {
+    color: gray;
+}
 .pad-scroll {
     padding-bottom: 5rem;
 }
+
