@@ -2,7 +2,9 @@
 
 # move changes into deployment branch
 git branch -D gh-pages > /dev/null 2>&1
-git switch --orphan gh-pages && git checkout main dist
+git switch --orphan gh-pages &&
+    git checkout main dist &&
+    git checkout main CNAME
 
 if [[ "$(git branch --show-current)" == "gh-pages" ]]; then
     echo "node_modules" >> .gitignore
