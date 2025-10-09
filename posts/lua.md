@@ -1,7 +1,7 @@
 ---
 title: A Language Analysis of Lua
 date: June 22, 2025
-edited: Oct 7, 2025
+edited: Oct 9, 2025
 summary: >
     An analysis of Lua as it relates to some general principles of programming languages.
 ---
@@ -1224,7 +1224,10 @@ The garbage collector cannot guess what we deem to be garbage. Leftover variable
 setmetatable({}, { __mode = "kv" })
 ```
 
-A typical problem occurs when, in a table with weak keys, a value refers to its own key. From the standard interpretation of weak tables, that entry would never be collected from the table. **Ephemeron tables** solve this problem. Since Lua 5.2, the reference to a value is only strong if there is some other external reference to the key. Otherwise the garbage collector will eventually collect the key and remove the entry from the table.
+A typical problem occurs when, in a table with weak keys, a value refers to its own key. From the standard interpretation of weak tables, that entry would never be collected from the table.
+\
+\
+**Ephemeron tables** solve this problem. Since Lua 5.2, the reference to a value is only strong if there is some other external reference to the key. Otherwise the garbage collector will eventually collect the key and remove the entry from the table.
 \
 \
 **Finalizers** are functions that are installed in an object to be called when that object is collected. They can be useful for extra cleanup or logging.
