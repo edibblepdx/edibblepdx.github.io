@@ -1,84 +1,84 @@
 <!-- Home Page -->
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>dibble</title>
+  <head>
+    <meta charset="UTF-8">
+    <title>dibble</title>
 
-        <!-- phones -->
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <!-- font -->
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap" rel="stylesheet">
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap" rel="stylesheet">
 
-        <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
-        <link rel="stylesheet" href="styles/palette.css">
-        <link rel="stylesheet" href="styles/reset.css">
-        <link rel="stylesheet" href="styles/navbar.css">
-        <link rel="stylesheet" href="styles/index.css">
-    </head>
-    <body class="content">
+    <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
+    <link rel="stylesheet" href="styles/palette.css">
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/navbar.css">
+    <link rel="stylesheet" href="styles/index.css">
+  </head>
+  <body class="content">
 <!-- Navbar -->
-        <div id="navbar">
-            <a href="https://edibblepdx.github.io/Oxid-8/" class="search" target="_blank">
-              <img src="resources/gamepad-solid-full.svg">
-            </a>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="portfolio.html">Portfolio</a></li>
-            </ul>
-            <a href="https://github.com/edibblepdx" class="github-mark" target="_blank">
-                <img src="resources/github-mark.svg">
-            </a>
-        </div>
+    <div id="navbar">
+      <a href="https://edibblepdx.github.io/Oxid-8/" class="search" target="_blank">
+        <img src="resources/gamepad-solid-full.svg">
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+      </ul>
+      <a href="https://github.com/edibblepdx" class="github-mark" target="_blank">
+        <img src="resources/github-mark.svg">
+      </a>
+    </div>
 <!-- Main Content -->
-        <main>
-            <div>
-                <h1 style="color: var(--color2)">Hello, I'm Ethan.</h1>
-                <br/>
-                <p>
-                    I am a student studying computer science and mathematics.
-                </p>
-                <br/>
-                <p>
-                    I'm particularly interested in pure mathematics and computer
-                    graphics. In my free time, I pick up math and programming
-                    books—doing exercises and learning new languages helps to
-                    keep me thinking and programming as much as possible.
-                </p>
-                <br/>
-                <a href="https://github.com/edibblepdx/booklist" class="book-mark" target="_blank">
-                    <img src="resources/book-solid-full.svg"> Book List
-                </a>
-                <br/>
+    <main>
+      <div>
+        <h1 style="color: var(--color2)">Hello, I'm Ethan.</h1>
+        <br/>
+        <p>
+          I am a student studying computer science and mathematics.
+        </p>
+        <br/>
+        <p>
+          I'm particularly interested in pure mathematics and computer
+          graphics. In my free time, I pick up math and programming
+          books—doing exercises and learning new languages helps to
+          keep me thinking and programming as much as possible.
+        </p>
+        <br/>
+        <a href="https://github.com/edibblepdx/booklist" class="book-mark" target="_blank">
+          <img src="resources/book-solid-full.svg"> Book List
+        </a>
+        <br/>
 <!-- Posts -->
 <!--
-                <ul id="list"></ul>
-                <template id="listItem">
-                    <li><a href="post.html?title=">
-                        <h2 id="post-title"></h2><br/>
-                        <p id="post-summary"></p><br/>
-                        <p id="post-date"></p>
-                    </a></li>
-                </template>
+        <ul id="list"></ul>
+        <template id="listItem">
+          <li><a href="post.html?title=">
+            <h2 id="post-title"></h2><br/>
+            <p id="post-summary"></p><br/>
+            <p id="post-date"></p>
+          </a></li>
+        </template>
 -->
-                <div class="container">
-                <ul id="list"></ul>
-                <template id="listItem">
-                    <li><a href="post.html?title=">
-                        <div class="pocket">
-                            <h2 id="post-title"></h2><br/>
-                            <p id="post-summary"></p><br/>
-                            <p id="post-date"></p>
-                        </div>
-                    </a></li>
-                </template>
-                </div>
+        <div class="container">
+        <ul id="list"></ul>
+        <template id="listItem">
+          <li><a href="post.html?title=">
+            <div class="pocket">
+              <h2 id="post-title"></h2><br/>
+              <p id="post-summary"></p><br/>
+              <p id="post-date"></p>
             </div>
-            <div class="pad-scroll"></div>
-        </main>
-    </body>
-    <script type="module" src="scripts/list.js"></script>
+          </a></li>
+        </template>
+        </div>
+      </div>
+      <div class="pad-scroll"></div>
+    </main>
+  </body>
+  <script type="module" src="scripts/list.js"></script>
 </html>
