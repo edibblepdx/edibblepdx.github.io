@@ -1,7 +1,7 @@
 ---
 title: 'Oxid-8: A Gentle Introduction to Rust and Emulation'
 date: Oct 7, 2025
-edited: Oct 7,2025
+edited: Oct 10,2025
 summary: >
     My experience learning Rust and Emulation by creating a Chip-8 interpreter.
 ---
@@ -108,6 +108,10 @@ I ended up writing a very simple shader that tinted the screen blue and curved t
 &nbsp;
 
 Wgpu is based on the WebGPU standard, but it can run both natively and in the browser. My primary target was the browser environment since that would be the simplest medium for which to share my project. But as long as you stay mindful of the desktop environment and use some conditional compilation, you can get a windowed version almost for free.
+
+&nbsp;
+
+I was also able to get mobile support recently. I was unable to fake input to the canvas element, I believe, because it was considered "untrusted"; however, I was able to create a user event and send it via an event loop proxy using wasm-bindgen. As long as you also have Chip-8 roms downloaded to your phone, you can play games in class or on the go!
 
 &nbsp;
 
