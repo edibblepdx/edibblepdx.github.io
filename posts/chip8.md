@@ -1,7 +1,7 @@
 ---
 title: 'Oxid-8: A Gentle Introduction to Rust and Emulation'
 date: Oct 7, 2025
-edited: Oct 7,2025
+edited: Oct 10,2025
 summary: >
     My experience learning Rust and Emulation by creating a Chip-8 interpreter.
 ---
@@ -20,7 +20,7 @@ There are already many excellent guides for Chip-8 emulation so the purpose of t
 
 &nbsp;
 
-All of my code is available on my [GitHub](https://github.com/edibblepdx/Oxid-8/tree/main) and the core [crate](https://crates.io/crates/oxid8-core) is fully documented to be used in implementing your own frontend. You can also use my interpreter in the browser [**here**](https://edibblepdx.github.io/Oxid-8/) or click on the controller icon up in the navbar as of writing. You will need your own games, but those are easy to find. The controls can also be found in the readme of the Git repository.
+All of my code is available on my [GitHub](https://github.com/edibblepdx/Oxid-8/tree/main) and the core [crate](https://crates.io/crates/oxid8-core) is fully documented to be used in implementing your own frontend. You can also use my interpreter in the browser or on your phone [**here**](https://edibblepdx.github.io/Oxid-8/), or click on the controller icon up in the navbar as of writing. You will need your own games, but those are easy to find. The controls can also be found in the readme of the Git repository.
 
 <a href="https://edibblepdx.github.io/Oxid-8/" target="_blank">
 <img src="https://github.com/user-attachments/assets/ab1f3bdc-4ab0-48f8-8563-1ee89c436e90" alt="Tetris drawing to Kitty terminal via Ratatui."/>
@@ -108,6 +108,10 @@ I ended up writing a very simple shader that tinted the screen blue and curved t
 &nbsp;
 
 Wgpu is based on the WebGPU standard, but it can run both natively and in the browser. My primary target was the browser environment since that would be the simplest medium for which to share my project. But as long as you stay mindful of the desktop environment and use some conditional compilation, you can get a windowed version almost for free.
+
+&nbsp;
+
+I was also able to get mobile support recently. I was unable to fake input to the canvas element, I believe, because it was considered "untrusted"; however, I was able to create a user event and send it via an event loop proxy using wasm-bindgen. As long as you also have Chip-8 roms downloaded to your phone, you can play games in class or on the go!
 
 &nbsp;
 
