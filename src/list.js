@@ -31,6 +31,9 @@ async function append(t) {
     const date = clone.querySelector('#post-date')
     date.textContent = content.attributes.date;
 
+    const length = clone.querySelector('#post-length');
+    length.textContent = `${content.attributes.length} min`;
+
     const summary = clone.querySelector('#post-summary');
     summary.textContent = content.attributes.summary;
 

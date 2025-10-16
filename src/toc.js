@@ -18,9 +18,10 @@ window.addEventListener('custom-content-loaded', () => {
   });
 
   // Track all headers that have an `id` applied
-  document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]').forEach((header) => {
-    observer.observe(header);
-  });
+  document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]')
+    .forEach((header) => {
+      observer.observe(header);
+    });
 
   // add padding above sections when jumped to
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {

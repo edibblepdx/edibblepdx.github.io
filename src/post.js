@@ -45,21 +45,22 @@ const options = {
 }
 
 const event = new Event('custom-content-loaded');
-let params = new URLSearchParams(document.location.search);
-let title = params.get("title");
+const params = new URLSearchParams(document.location.search);
+const title = params.get("title");
 if (title) {
   fetch('posts/' + title + '.md')
     .then((response) => {
       return response.text();
     })
     .then((text) => {
-      let content = fm(text);
+      const content = fm(text);
 
       /* title and date */
       document.getElementById('title').innerHTML =
         marked.parse(
           '# ' + content.attributes.title + '\n\n' +
-          '### ' + content.attributes.date
+          '### ' + content.attributes.date + '\n\n' +
+          '#### ' + `${content.attributes.length} min`
         );
 
       /* (body only) id headings and apply postprocessing */

@@ -2,6 +2,7 @@
 title: How I Created a Free Static Website Using GitHub Pages
 date: Jan 16, 2025
 edited: Jan 16,2025
+length: 12
 summary: >
     Learn how I created a static portfolio & blog website without any frameworks using HTML, CSS, and JavaScript. And utilizing Markedjs to parse markdown files. We bundle our scripts using Rollup and deploy the site for free using GitHub Pages.
 ---

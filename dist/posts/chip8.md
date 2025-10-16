@@ -2,6 +2,7 @@
 title: 'Oxid-8: A Gentle Introduction to Rust and Emulation'
 date: Oct 7, 2025
 edited: Oct 10,2025
+length: 6
 summary: >
     My experience learning Rust and Emulation by creating a Chip-8 interpreter.
 ---

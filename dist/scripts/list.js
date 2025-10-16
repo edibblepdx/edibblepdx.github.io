@@ -4237,43 +4237,46 @@
 	var fm = /*@__PURE__*/getDefaultExportFromCjs(frontMatterExports);
 
 	async function getPosts() {
-	    const response = await fetch('posts/posts.json');
-	    const posts = await response.json();
-	    return posts;
+	  const response = await fetch('posts/posts.json');
+	  const posts = await response.json();
+	  return posts;
 	}
 
 	async function appendPosts() {
-	    const posts = await getPosts();
-	    for (const title of posts) {
-	        await append(title);
-	    }
+	  const posts = await getPosts();
+	  for (const title of posts) {
+	    await append(title);
+	  }
 	}
 
 	async function append(t) {
-	    try {
-	        const response = await fetch('posts/' + t + '.md');
-	        const text = await response.text();
+	  try {
+	    const response = await fetch('posts/' + t + '.md');
+	    const text = await response.text();
 
-	        const content = fm(text);
-	        const template = document.getElementById('listItem');
-	        const clone = template.content.cloneNode(true);
+	    const content = fm(text);
+	    const template = document.getElementById('listItem');
+	    const clone = template.content.cloneNode(true);
 
-	        const anchor = clone.querySelector('a');
-	        anchor.href = 'post.html?title=' + t;
+	    const anchor = clone.querySelector('a');
+	    anchor.href = 'post.html?title=' + t;
 
-	        const title = clone.querySelector('#post-title');
-	        title.textContent = content.attributes.title;
+	    const title = clone.querySelector('#post-title');
+	    title.textContent = content.attributes.title;
 
-	        const date = clone.querySelector('#post-date');
-	        date.textContent = content.attributes.date;
+	    const date = clone.querySelector('#post-date');
+	    date.textContent = content.attributes.date;
 
-	        const summary = clone.querySelector('#post-summary');
-	        summary.textContent = content.attributes.summary;
+	    const length = clone.querySelector('#post-length');
+	    length.textContent = `${content.attributes.length} min`;
 
-	        document.getElementById('list').appendChild(clone);
-	    } catch (err) {
-	        console.error(err);
-	    }
+	    const summary = clone.querySelector('#post-summary');
+	    summary.textContent = content.attributes.summary;
+
+	    document.getElementById('list').appendChild(clone);
+	  } catch (err) {
+	    console.error(err);
+	  }
 	}
 
 	appendPosts();
