@@ -1,0 +1,87 @@
+main {
+    display: grid;
+    grid-template-columns:
+        minmax(2rem, 1fr)
+        minmax(0, 40rem)
+        minmax(2rem, 1fr);
+}
+main > div {
+    grid-column: 2;
+    align-self: stretch;
+}
+main a {
+    color: var(--soft-white)
+}
+h1 {
+    color: var(--color2);
+}
+.download {
+    display: inline-block;
+    vertical-align: middle;
+}
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.container a {
+    text-decoration: none;
+}
+.pocket {
+    /* self */
+    flex: 0 0 auto;
+    padding: 1rem;
+    /* children */
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    /* embellishments */
+    background-color: var(--soft-black);
+    border-radius: 16px;
+    transition: background-color 100ms ease-in-out;
+}
+.pocket:hover {
+    /* lighten */
+    background-color: var(--soft-gray);
+}
+.pocket div {
+    flex: 1 1 0;
+    padding-right: 1rem;
+    /* This makes the text wrap. I do not know why. */
+    overflow: hidden;
+}
+.pocket img {
+    border-radius: 12px;
+    margin-right: 1rem;
+    height: 8rem;
+    width: 8rem;
+}
+.pocket h2 {
+    font-weight: bold;
+    text-decoration: underline;
+    /* default font for non-headers is 20px */
+    font-size: 30px;
+}
+.pocket p {
+    color: gray;
+}
+@media only screen and (max-width: 40rem) {
+/* squish edge padding on narrower screens */
+    main {
+        grid-template-columns:
+            minmax(1rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(1rem, 1fr);
+    }
+/* shrink pocket header on narrower screens */
+    .pocket h2 {
+        font-size: 20px;
+        hyphens: auto;
+    }
+/* resize pocket images on narrower screens */
+    .pocket img {
+        height: 6rem;
+        width: 6rem;
+    }
+}
+}

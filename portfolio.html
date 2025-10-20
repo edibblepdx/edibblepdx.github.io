@@ -1,0 +1,128 @@
+<!-- Portfolio Page -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>dibble</title>
+
+<!-- phones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- embed -->
+    <meta content="Ethan Dibble" property="og:title" />
+    <meta content="Blog and Portfolio" property="og:description" />
+    <meta content="https://dibble.me/" property="og:url" />
+    <meta content="https://dibble.me/images/anomalocaris.png" property="og:image" />
+    <meta content="#ffb5b5" data-react-helmet="true" name="theme-color" />
+
+<!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wdth,wght@0,75..100,100..900;1,75..100,100..900&display=swap" rel="stylesheet">
+
+    <link rel="icon" type="image/x-icon" href="resources/favicon.ico">
+    <link rel="stylesheet" href="styles/palette.css">
+    <link rel="stylesheet" href="styles/reset.css">
+    <link rel="stylesheet" href="styles/navbar.css">
+    <link rel="stylesheet" href="styles/portfolio.css">
+  </head>
+  <body class="content">
+<!-- Navbar -->
+    <div id="navbar">
+      <a href="https://edibblepdx.github.io/Oxid-8/" class="search" target="_blank">
+        <img src="resources/gamepad-solid-full.svg">
+      </a>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+      </ul>
+      <a href="https://github.com/edibblepdx" class="github-mark" target="_blank">
+        <img src="resources/github-mark.svg">
+      </a>
+    </div>
+<!-- Main Content -->
+    <main>
+      <div style="margin-bottom:1rem; text-align:center"> 
+        <!-- Style -->
+        <h1>Ethan Dibble</h1>
+        <a href="resources/resume.pdf" download>
+          <img src="resources/download.svg" class="download">
+          pdf resume
+        </a>
+      </div>
+      <!--
+      <div class="grid">
+        <a class="pocket" href="https://github.com/edibblepdx/music-genre-classifier" target="_blank"/>
+          One
+        </a>
+        <a class="pocket" href="" target="_blank">Two</a>
+        <a class="pocket">Three</a>
+        <a class="pocket">Four</a>
+        <a class="pocket">Five</a>
+      </div>
+      -->
+      <div class="container">
+        <a href="https://github.com/edibblepdx/rayt-rs" target="_blank">
+          <div class="pocket">
+            <img src="images/rayt.png" alt="Ray traced spheres.">
+            <div>
+              <h2> Rayt-rs </h2>
+              <!--
+              <p>Multi-threaded software ray tracer in Rust supporting scene description files in toml, with multiple samplers and materials.</p>
+              -->
+              <p>Multi-threaded software ray tracer in Rust.</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://github.com/edibblepdx/Oxid-8" target="_blank">
+          <div class="pocket">
+            <img src="images/tetris.png" alt="Tetris running on the Oxid-8.">
+            <div>
+              <h2> Oxid-8 </h2>
+              <p>Chip-8 interpreter in Rust.</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://github.com/edibblepdx/planet" target="_blank">
+          <div class="pocket">
+            <img src="images/planet.png" alt="Planet Earth.">
+            <div>
+              <h2> Planet </h2>
+              <p>Recursively subdivided planet in JavaScript.</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://github.com/edibblepdx/music-genre-classifier" target="_blank">
+          <div class="pocket">
+            <img src="images/spectrogram.png" alt="Spectrogram graph.">
+            <div>
+              <h2> Music Genre Class&shy;ifier </h2>
+              <p>Collaborative ML research project and paper.</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://github.com/edibblepdx/love-raycasting" target="_blank">
+          <div class="pocket">
+            <img src="images/loveraycasting.png" alt="Raycasting in Lua and Love2D">
+            <div>
+              <h2> Love Raycasting </h2>
+              <p>Raycaster in Lua and Love2D.</p>
+            </div>
+          </div>
+        </a>
+        <a href="https://github.com/edibblepdx/Amusement-Park-Project" target="_blank">
+          <div class="pocket">
+            <img src="images/amusementpark.png" alt="3D Amusement Park">
+            <div>
+              <h2> Open&shy;GL Amuse&shy;ment Park </h2>
+              <p>3D Amusement park in C++ and OpenGL.</p>
+            </div>
+          </div>
+        </a>
+        <div align="center">
+          <img src="https://github-readme-stats-edibble.vercel.app/api/top-langs?username=edibblepdx&locale=en&hide_title=true&layout=compact&card_width=450&langs_count=9&theme=react&hide_border=true&order=2&bg_color=00000000&text_color=d0d0d0&columns=4" height="275" alt="languages graph"  />
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
