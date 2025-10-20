@@ -5,17 +5,6 @@ main {
         minmax(0, 40rem)
         minmax(2rem, 1fr);
 }
-/* squish edge padding on narrower screens */
-@media only screen and (max-width: 40rem) {
-    main {
-        grid-template-columns:
-            minmax(1rem, 1fr)
-            minmax(0, 40rem)
-            minmax(1rem, 1fr);
-    }
-    /* hide image */
-    .pocket img {display: none;}
-}
 main > div {
     grid-column: 2;
     align-self: stretch;
@@ -41,7 +30,6 @@ h1 {
 .pocket {
     /* self */
     flex: 0 0 auto;
-    height: 10rem;
     padding: 1rem;
     /* children */
     display: flex;
@@ -76,4 +64,24 @@ h1 {
 }
 .pocket p {
     color: gray;
+}
+@media only screen and (max-width: 40rem) {
+/* squish edge padding on narrower screens */
+    main {
+        grid-template-columns:
+            minmax(1rem, 1fr) 
+            minmax(0, 40rem) 
+            minmax(1rem, 1fr);
+    }
+/* shrink pocket header on narrower screens */
+    .pocket h2 {
+        font-size: 20px;
+        hyphens: auto;
+    }
+/* resize pocket images on narrower screens */
+    .pocket img {
+        height: 6rem;
+        width: 6rem;
+    }
+}
 }
